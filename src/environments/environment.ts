@@ -1,5 +1,4 @@
 ﻿export const environment = {
-  apiUrl: 'http://localhost:8000/api/v1',
+  apiUrl: 'https://aura-spa-backend-263526504096.us-central1.run.app/api/v1',
   idleTimeoutMs: 10 * 60 * 1000,
 };
-

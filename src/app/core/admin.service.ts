@@ -8,7 +8,6 @@ export interface AdminSummary {
   date: string;
   today_total: number;
   confirmed: number;
-  pending: number;
   attended: number;
   cancelled: number;
   rescheduled: number;

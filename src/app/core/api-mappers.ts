@@ -77,7 +77,7 @@ export const mapAppointmentFromApi = (data: AnyRecord): Appointment => ({
   professionalId: data.professional_id ?? data.professionalId,
   date: data.date,
   time: data.time,
-  status: data.status === 'pending' ? 'confirmed' : data.status,
+  status: data.status,
   notes: data.notes ?? null,
   history: (data.history ?? []).map(mapHistoryItem),
 });

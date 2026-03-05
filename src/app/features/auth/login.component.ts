@@ -53,7 +53,7 @@ export class LoginComponent {
   }
 
   get emailValid(): boolean {
-    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(this.email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
   }
 
   get canSubmit(): boolean {

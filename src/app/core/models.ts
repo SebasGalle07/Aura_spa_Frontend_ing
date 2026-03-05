@@ -11,6 +11,7 @@ export interface User {
 
 export interface TokenResponse {
   accessToken: string;
+  refreshToken?: string | null;
   tokenType: string;
   user: User;
 }

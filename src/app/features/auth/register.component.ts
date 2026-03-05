@@ -64,7 +64,7 @@ export class RegisterComponent {
   }
 
   get emailValid(): boolean {
-    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(this.email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
   }
 
   get passwordMinOk(): boolean {
