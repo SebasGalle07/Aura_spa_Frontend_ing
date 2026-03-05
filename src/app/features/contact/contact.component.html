@@ -1,0 +1,31 @@
+﻿<section class="section">
+  <div class="container grid">
+    <div>
+      <h1>Contactanos</h1>
+      <p>Si tienes preguntas, dejanos tus datos y nos comunicaremos contigo.</p>
+      <div class="card info" *ngIf="company$ | async as company">
+        <p>{{ company.address || 'Cra. 5 #120-45, Bogota' }}</p>
+        <p>{{ company.phone || '+57 300 123 4567' }}</p>
+        <p>{{ company.email || 'info@auraspa.com' }}</p>
+      </div>
+    </div>
+
+    <form class="card form" (ngSubmit)="submit()">
+      <label>
+        Nombre
+        <input type="text" [(ngModel)]="name" name="name" />
+      </label>
+      <label>
+        Correo
+        <input type="email" [(ngModel)]="email" name="email" />
+      </label>
+      <label>
+        Mensaje
+        <textarea rows="5" [(ngModel)]="message" name="message"></textarea>
+      </label>
+      <button class="btn btn--primary" type="submit">Enviar</button>
+    </form>
+  </div>
+</section>
+
+

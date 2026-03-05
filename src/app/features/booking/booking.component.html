@@ -1,0 +1,109 @@
+﻿<section class="section">
+  <div class="container">
+    <h1>Reservar cita</h1>
+    <p class="lead">Selecciona el servicio, el profesional y el horario que prefieras.</p>
+
+    <div class="step">
+      <h2>1. Servicio</h2>
+      <div class="cards">
+        <button
+          type="button"
+          class="card selectable"
+          *ngFor="let service of services"
+          [class.is-selected]="selectedService?.id === service.id"
+          (click)="selectService(service)"
+        >
+          <h3>{{ service.name }}</h3>
+          <p>{{ service.category }} · {{ service.duration }} min</p>
+          <strong>{{ formatPrice(service.price) }}</strong>
+        </button>
+      </div>
+    </div>
+
+    <div class="step" *ngIf="selectedService">
+      <h2>2. Profesional</h2>
+      <div class="cards">
+        <button
+          type="button"
+          class="card selectable"
+          *ngFor="let pro of professionals"
+          [class.is-selected]="selectedProfessional?.id === pro.id"
+          (click)="selectProfessional(pro)"
+        >
+          <h3>{{ pro.name }}</h3>
+          <p>{{ pro.specialty }}</p>
+          <span>{{ pro.scheduleStart }} - {{ pro.scheduleEnd }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="step" *ngIf="selectedService && selectedProfessional">
+      <h2>3. Fecha y hora</h2>
+      <div class="schedule">
+        <label>
+          Fecha
+          <input type="date" [(ngModel)]="date" [min]="minDate" (change)="loadSlots()" />
+        </label>
+        <div class="slots">
+          <p *ngIf="loadingSlots">Cargando horarios...</p>
+          <p *ngIf="!loadingSlots && !slots.length">Sin disponibilidad para esta fecha.</p>
+          <button
+            type="button"
+            *ngFor="let slot of slots"
+            class="slot"
+            [class.is-selected]="selectedTime === slot"
+            (click)="selectedTime = slot"
+          >
+            {{ slot }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" *ngIf="selectedTime">
+      <h2>4. Confirmacion</h2>
+      <div class="card summary">
+        <div>
+          <h3>Resumen</h3>
+          <p>Servicio: {{ selectedService?.name }}</p>
+          <p>Profesional: {{ selectedProfessional?.name }}</p>
+          <p>Fecha: {{ date }} · {{ selectedTime }}</p>
+        </div>
+        <div class="summary__form">
+          <label>
+            Nombre
+            <input type="text" [(ngModel)]="clientName" />
+          </label>
+          <label>
+            Correo
+            <input type="email" [(ngModel)]="clientEmail" />
+          </label>
+          <label>
+            Telefono
+            <input type="text" [(ngModel)]="clientPhone" />
+          </label>
+          <label>
+            Observaciones
+            <textarea rows="3" [(ngModel)]="notes"></textarea>
+          </label>
+          <button class="btn btn--primary" type="button" (click)="confirmBooking()" [disabled]="creating">
+            {{ creating ? 'Confirmando...' : 'Confirmar cita' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="success" *ngIf="createdAppointment">
+      <h2>Cita confirmada</h2>
+      <p>Tu reserva fue registrada con exito.</p>
+      <div class="success__actions">
+        <a class="btn btn--primary" routerLink="/appointments">Ver mis citas</a>
+        <button class="btn btn--secondary" type="button" (click)="createdAppointment = undefined">
+          Nueva reserva
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+

@@ -1,0 +1,36 @@
+﻿<section class="section">
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Nuestros servicios</h1>
+        <p>Selecciona el tratamiento que mejor se adapte a ti.</p>
+      </div>
+      <div class="filter">
+        <label for="category">Categoria</label>
+        <select id="category" [(ngModel)]="category" (change)="applyFilter()">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="cards" *ngIf="!loading; else loadingBlock">
+      <article class="card service-card" *ngFor="let service of filtered">
+        <div class="service-card__image" [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''"></div>
+        <div class="service-card__body">
+          <h3>{{ service.name }}</h3>
+          <p>{{ service.category }}</p>
+          <div class="service-card__meta">
+            <span>{{ service.duration }} min</span>
+            <strong>{{ formatPrice(service.price) }}</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #loadingBlock>
+      <div class="loading">Cargando servicios...</div>
+    </ng-template>
+  </div>
+</section>
+
+

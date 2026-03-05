@@ -1,0 +1,35 @@
+﻿<header class="nav">
+  <div class="nav__brand">
+    <a routerLink="/" class="brand-link">
+      <ng-container *ngIf="branding$ | async as branding">
+        <img *ngIf="branding.spLogo" [src]="branding.spLogo" alt="Aura Spa" class="brand-logo" />
+      </ng-container>
+      <span class="brand-text">Aura Spa</span>
+    </a>
+  </div>
+
+  <button class="nav__toggle" (click)="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <nav class="nav__links" [class.is-open]="menuOpen">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <a routerLink="/services" routerLinkActive="active">Servicios</a>
+    <a routerLink="/about" routerLinkActive="active">Acerca de</a>
+    <a routerLink="/contact" routerLinkActive="active">Contacto</a>
+
+    <ng-container *ngIf="user$ | async as user; else guest">
+      <a routerLink="/book" routerLinkActive="active">Reservar</a>
+      <a routerLink="/appointments" routerLinkActive="active">Mis citas</a>
+      <a routerLink="/profile" routerLinkActive="active">Perfil</a>
+      <a *ngIf="user.role === 'admin'" routerLink="/admin" routerLinkActive="active">Admin</a>
+      <button class="btn btn--ghost" (click)="logout()">Cerrar sesion</button>
+    </ng-container>
+    <ng-template #guest>
+      <a routerLink="/login" class="btn btn--ghost">Iniciar sesion</a>
+      <a routerLink="/register" class="btn btn--primary">Registrarse</a>
+    </ng-template>
+  </nav>
+</header>
+
+

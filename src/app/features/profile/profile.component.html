@@ -1,0 +1,63 @@
+﻿<section class="section" *ngIf="user">
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Mi perfil</h1>
+        <p>Gestiona tu informacion personal.</p>
+      </div>
+      <div class="stats">
+        <div>
+          <strong>{{ totalAppointments }}</strong>
+          <span>Total citas</span>
+        </div>
+        <div>
+          <strong>{{ attendedAppointments }}</strong>
+          <span>Atendidas</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Datos personales</h3>
+        <label>
+          Nombre
+          <input type="text" [(ngModel)]="name" />
+        </label>
+        <label>
+          Correo
+          <input type="email" [(ngModel)]="email" />
+        </label>
+        <label>
+          Telefono
+          <input type="text" [(ngModel)]="phone" />
+        </label>
+        <p class="role">Rol: {{ roleLabel(user.role) }}</p>
+        <button class="btn btn--primary" type="button" (click)="saveProfile()" [disabled]="saving">
+          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+
+      <div class="card">
+        <h3>Cambiar contrasena</h3>
+        <label>
+          Contrasena actual
+          <input type="password" [(ngModel)]="currentPassword" />
+        </label>
+        <label>
+          Nueva contrasena
+          <input type="password" [(ngModel)]="newPassword" />
+        </label>
+        <label>
+          Confirmar contrasena
+          <input type="password" [(ngModel)]="confirmPassword" />
+        </label>
+        <button class="btn btn--secondary" type="button" (click)="changePassword()" [disabled]="changing">
+          {{ changing ? 'Actualizando...' : 'Actualizar contrasena' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+

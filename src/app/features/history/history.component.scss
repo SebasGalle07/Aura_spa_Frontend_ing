@@ -1,0 +1,75 @@
+﻿.section {
+  padding: 48px 0;
+}
+
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  margin-bottom: 6px;
+}
+
+.lead {
+  margin-bottom: 24px;
+  color: #5a463a;
+}
+
+.list {
+  display: grid;
+  gap: 16px;
+}
+
+.apt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.apt__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tag--confirmed {
+  background: #eaf5ec;
+  color: #1e7e34;
+}
+
+.tag--cancelled {
+  background: #fdecea;
+  color: #9b1c1c;
+}
+
+.tag--attended {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.tag--rescheduled {
+  background: #fff4ed;
+  color: #9a3412;
+}
+
+.loading,
+.empty {
+  padding: 24px;
+  border: 1px dashed var(--taupe);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.empty {
+  display: grid;
+  gap: 12px;
+}
+
+

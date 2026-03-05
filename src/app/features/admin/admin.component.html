@@ -1,0 +1,213 @@
+﻿<section class="section">
+  <div class="container">
+    <div class="admin__header">
+      <h1>Panel admin</h1>
+      <p>Gestion completa de citas, servicios y usuarios.</p>
+    </div>
+
+    <div class="tabs">
+      <button type="button" [class.active]="tab === 'summary'" (click)="setTab('summary')">Resumen</button>
+      <button type="button" [class.active]="tab === 'appointments'" (click)="setTab('appointments')">Citas</button>
+      <button type="button" [class.active]="tab === 'services'" (click)="setTab('services')">Servicios</button>
+      <button type="button" [class.active]="tab === 'professionals'" (click)="setTab('professionals')">Profesionales</button>
+      <button type="button" [class.active]="tab === 'users'" (click)="setTab('users')">Usuarios</button>
+      <button type="button" [class.active]="tab === 'company'" (click)="setTab('company')">Empresa</button>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'summary'">
+      <div class="summary-grid" *ngIf="summary">
+        <div class="card">
+          <h3>Citas hoy</h3>
+          <strong>{{ summary.today_total }}</strong>
+        </div>
+        <div class="card">
+          <h3>Confirmadas</h3>
+          <strong>{{ summary.confirmed }}</strong>
+        </div>
+        <div class="card">
+          <h3>Atendidas</h3>
+          <strong>{{ summary.attended }}</strong>
+        </div>
+        <div class="card">
+          <h3>Canceladas</h3>
+          <strong>{{ summary.cancelled }}</strong>
+        </div>
+        <div class="card">
+          <h3>Reprogramadas</h3>
+          <strong>{{ summary.rescheduled }}</strong>
+        </div>
+      </div>
+
+      <div class="card" *ngIf="agenda.length">
+        <h3>Agenda del dia</h3>
+        <div class="list">
+          <div class="list__item" *ngFor="let apt of agenda">
+            <div>
+              <strong>{{ getServiceName(apt.serviceId) }}</strong>
+              <p>{{ apt.date }} · {{ apt.time }}</p>
+            </div>
+            <span [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'appointments'">
+      <div class="list">
+        <div class="card apt" *ngFor="let apt of appointments">
+          <div>
+            <strong>{{ getServiceName(apt.serviceId) }}</strong>
+            <p>{{ apt.clientName }} · {{ apt.clientEmail }}</p>
+            <p>{{ apt.date }} · {{ apt.time }} · {{ getProfessionalName(apt.professionalId) }}</p>
+          </div>
+          <div class="apt__actions">
+            <span [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+            <button class="btn btn--ghost" type="button" (click)="confirm(apt)">Confirmar</button>
+            <button class="btn btn--ghost" type="button" (click)="attend(apt)">Atendida</button>
+            <button class="btn btn--ghost" type="button" (click)="cancel(apt)">Cancelar</button>
+            <button class="btn btn--secondary" type="button" (click)="openReschedule(apt)">Reprogramar</button>
+          </div>
+          <div class="reschedule" *ngIf="rescheduleId === apt.id">
+            <label>
+              Nueva fecha
+              <input type="date" [(ngModel)]="rescheduleDate" />
+            </label>
+            <label>
+              Nueva hora
+              <input type="time" [(ngModel)]="rescheduleTime" />
+            </label>
+            <button class="btn btn--primary" type="button" (click)="saveReschedule()">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'services'">
+      <div class="form-grid">
+        <div class="card form">
+          <h3>{{ editingServiceId ? 'Editar servicio' : 'Nuevo servicio' }}</h3>
+          <label>Nombre <input type="text" [(ngModel)]="serviceForm.name" /></label>
+          <label>Categoria <input type="text" [(ngModel)]="serviceForm.category" /></label>
+          <label>Duracion (min) <input type="number" [(ngModel)]="serviceForm.duration" /></label>
+          <label>Precio COP <input type="number" [(ngModel)]="serviceForm.price" /></label>
+          <label>Imagen URL <input type="text" [(ngModel)]="serviceForm.image" /></label>
+          <label class="checkbox"><input type="checkbox" [(ngModel)]="serviceForm.active" /> Activo</label>
+          <div class="actions">
+            <button class="btn btn--primary" type="button" (click)="saveService()">Guardar</button>
+            <button class="btn btn--secondary" type="button" (click)="resetServiceForm()">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="list">
+          <div class="card item" *ngFor="let service of services">
+            <div>
+              <strong>{{ service.name }}</strong>
+              <p>{{ service.category }} · {{ service.duration }} min</p>
+            </div>
+            <button class="btn btn--ghost" type="button" (click)="editService(service)">Editar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'professionals'">
+      <div class="form-grid">
+        <div class="card form">
+          <h3>{{ editingProfessionalId ? 'Editar profesional' : 'Nuevo profesional' }}</h3>
+          <label>Nombre <input type="text" [(ngModel)]="professionalForm.name" /></label>
+          <label>Especialidad <input type="text" [(ngModel)]="professionalForm.specialty" /></label>
+          <label>Inicio <input type="time" [(ngModel)]="professionalForm.scheduleStart" /></label>
+          <label>Fin <input type="time" [(ngModel)]="professionalForm.scheduleEnd" /></label>
+          <label class="checkbox"><input type="checkbox" [(ngModel)]="professionalForm.active" /> Activo</label>
+          <div class="actions">
+            <button class="btn btn--primary" type="button" (click)="saveProfessional()">Guardar</button>
+            <button class="btn btn--secondary" type="button" (click)="resetProfessionalForm()">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="list">
+          <div class="card item" *ngFor="let pro of professionals">
+            <div>
+              <strong>{{ pro.name }}</strong>
+              <p>{{ pro.specialty }} · {{ pro.scheduleStart }} - {{ pro.scheduleEnd }}</p>
+            </div>
+            <button class="btn btn--ghost" type="button" (click)="editProfessional(pro)">Editar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'users'">
+      <div class="form-grid">
+        <div class="card form">
+          <h3>{{ editingUserId ? 'Editar usuario' : 'Nuevo usuario' }}</h3>
+          <label>Nombre <input type="text" [(ngModel)]="userForm.name" /></label>
+          <label>Correo <input type="email" [(ngModel)]="userForm.email" /></label>
+          <label>Telefono <input type="text" [(ngModel)]="userForm.phone" /></label>
+          <label>Rol
+            <select [(ngModel)]="userForm.role">
+              <option value="client">Cliente</option>
+              <option value="professional">Profesional</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </label>
+          <label>Contrasena <input type="password" [(ngModel)]="userForm.password" /></label>
+          <div class="actions">
+            <button class="btn btn--primary" type="button" (click)="saveUser()">Guardar</button>
+            <button class="btn btn--secondary" type="button" (click)="resetUserForm()">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="list">
+          <div class="card item" *ngFor="let user of users">
+            <div>
+              <strong>{{ user.name }}</strong>
+              <p>{{ user.email }} · {{ user.role }}</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn--ghost" type="button" (click)="editUser(user)">Editar</button>
+              <button class="btn btn--ghost" type="button" (click)="deleteUser(user)">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'company'">
+      <div class="form-grid">
+        <div class="card form">
+          <h3>Datos de la empresa</h3>
+          <label>Nombre comercial <input type="text" [(ngModel)]="companyForm.businessName" /></label>
+          <label>Razon social <input type="text" [(ngModel)]="companyForm.legalName" /></label>
+          <label>NIT <input type="text" [(ngModel)]="companyForm.nit" /></label>
+          <label>Direccion <input type="text" [(ngModel)]="companyForm.address" /></label>
+          <label>Ciudad <input type="text" [(ngModel)]="companyForm.city" /></label>
+          <label>Telefono <input type="text" [(ngModel)]="companyForm.phone" /></label>
+          <label>Email <input type="email" [(ngModel)]="companyForm.email" /></label>
+          <label>Horario semana inicio <input type="time" [(ngModel)]="companyForm.weekStart" /></label>
+          <label>Horario semana fin <input type="time" [(ngModel)]="companyForm.weekEnd" /></label>
+          <label>Horario sabado inicio <input type="time" [(ngModel)]="companyForm.satStart" /></label>
+          <label>Horario sabado fin <input type="time" [(ngModel)]="companyForm.satEnd" /></label>
+          <label>Horario domingo inicio <input type="time" [(ngModel)]="companyForm.sunStart" /></label>
+          <label>Horario domingo fin <input type="time" [(ngModel)]="companyForm.sunEnd" /></label>
+          <label>Instagram <input type="text" [(ngModel)]="companyForm.instagram" /></label>
+          <label>Facebook <input type="text" [(ngModel)]="companyForm.facebook" /></label>
+          <label>Whatsapp <input type="text" [(ngModel)]="companyForm.whatsapp" /></label>
+          <label>Mensaje bienvenida <textarea rows="3" [(ngModel)]="companyForm.welcomeMsg"></textarea></label>
+          <button class="btn btn--primary" type="button" (click)="saveCompany()">Guardar</button>
+        </div>
+
+        <div class="card form">
+          <h3>Branding</h3>
+          <label>Logo URL <input type="text" [(ngModel)]="brandingForm.spLogo" /></label>
+          <label>Imagen seccion 1 <input type="text" [(ngModel)]="brandingForm.landingImages.section1" /></label>
+          <label>Imagen seccion 2 <input type="text" [(ngModel)]="brandingForm.landingImages.section2" /></label>
+          <label>Imagen seccion 3 <input type="text" [(ngModel)]="brandingForm.landingImages.section3" /></label>
+          <button class="btn btn--primary" type="button" (click)="saveBranding()">Guardar branding</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+

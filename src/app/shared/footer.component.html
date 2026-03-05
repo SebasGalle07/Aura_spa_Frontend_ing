@@ -1,0 +1,21 @@
+﻿<footer class="footer">
+  <div class="footer__brand">
+    <ng-container *ngIf="branding$ | async as branding">
+      <img *ngIf="branding.spLogo" [src]="branding.spLogo" alt="Aura Spa" />
+    </ng-container>
+    <div>
+      <h3>Aura Spa</h3>
+      <p>Bienestar que transforma</p>
+    </div>
+  </div>
+
+  <div class="footer__info" *ngIf="company$ | async as company">
+    <p>{{ company.address || 'Cra. 5 #120-45, Bogota' }}</p>
+    <p>{{ company.phone || '+57 300 123 4567' }}</p>
+    <p>{{ company.email || 'info@auraspa.com' }}</p>
+  </div>
+
+  <p class="footer__copy">(c) 2026 Aura Spa S.A.S. - Todos los derechos reservados.</p>
+</footer>
+
+

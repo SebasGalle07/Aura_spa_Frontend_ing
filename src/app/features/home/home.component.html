@@ -1,0 +1,115 @@
+﻿<section class="hero">
+  <div class="container hero__grid">
+    <div class="hero__content">
+      <p class="eyebrow">Aura Spa</p>
+      <h1>Bienestar que transforma</h1>
+      <p class="hero__lead">
+        Descubre una experiencia de spa pensada para ti. Reserva tu cita en minutos y disfruta un
+        espacio de calma y cuidado profesional.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" [routerLink]="isLoggedIn ? '/book' : '/login'">Reservar ahora</a>
+        <a class="btn btn--secondary" routerLink="/services">Ver servicios</a>
+      </div>
+      <div class="hero__stats">
+        <div>
+          <strong>+3.000</strong>
+          <span>clientes satisfechos</span>
+        </div>
+        <div>
+          <strong>Profesionales</strong>
+          <span>certificados</span>
+        </div>
+        <div>
+          <strong>Agenda</strong>
+          <span>flexible</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero__image">
+      <ng-container *ngIf="branding$ | async as branding; else heroFallback">
+        <img
+          *ngIf="branding.landingImages?.section1; else heroFallback"
+          [src]="branding.landingImages?.section1"
+          alt="Aura Spa"
+        />
+      </ng-container>
+      <ng-template #heroFallback>
+        <div class="hero__fallback">
+          <span>Imagen principal</span>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section__header">
+      <div>
+        <h2>Servicios destacados</h2>
+        <p>Tratamientos de alta calidad para cuerpo y mente.</p>
+      </div>
+      <a class="btn btn--ghost" routerLink="/services">Ver todos</a>
+    </div>
+
+    <div class="cards" *ngIf="!loading && featured.length; else emptyBlock">
+      <article class="card service-card" *ngFor="let service of featured">
+        <div class="service-card__image" [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''"></div>
+        <div class="service-card__body">
+          <h3>{{ service.name }}</h3>
+          <p>{{ service.category }} · {{ service.duration }} min</p>
+          <strong>{{ formatPrice(service.price) }}</strong>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #emptyBlock>
+      <div class="loading" *ngIf="loading">Cargando servicios...</div>
+      <div class="loading" *ngIf="!loading">No hay servicios disponibles por ahora.</div>
+    </ng-template>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="container split">
+    <div>
+      <h2>Tu bienestar es nuestra prioridad</h2>
+      <p>
+        En Aura Spa combinamos tecnicas de relajacion, estetica y bienestar holistico para crear un
+        momento de calma real. Disenamos cada cita de acuerdo con tus necesidades.
+      </p>
+      <ul class="list">
+        <li>Atencion personalizada y acompanamiento profesional.</li>
+        <li>Ambientes seguros, limpios y pensados para desconectar.</li>
+        <li>Agenda digital y confirmacion inmediata.</li>
+      </ul>
+    </div>
+    <div class="split__image">
+      <ng-container *ngIf="branding$ | async as branding; else aboutFallback">
+        <img
+          *ngIf="branding.landingImages?.section2; else aboutFallback"
+          [src]="branding.landingImages?.section2"
+          alt="Experiencia Aura Spa"
+        />
+      </ng-container>
+      <ng-template #aboutFallback>
+        <div class="image-placeholder">
+          <span>Imagen de bienestar</span>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container cta">
+    <div>
+      <h2>Lista para tu proxima cita?</h2>
+      <p>Reserva en linea en menos de dos minutos. Te esperamos.</p>
+    </div>
+    <a class="btn btn--primary" [routerLink]="isLoggedIn ? '/book' : '/login'">Agendar cita</a>
+  </div>
+</section>
+
+

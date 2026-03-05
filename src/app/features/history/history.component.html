@@ -1,0 +1,31 @@
+﻿<section class="section">
+  <div class="container">
+    <h1>Mis citas</h1>
+    <p class="lead">Historial de reservas.</p>
+
+    <div *ngIf="loading" class="loading">Cargando citas...</div>
+
+    <div class="list" *ngIf="!loading && appointments.length">
+      <article class="card apt" *ngFor="let apt of appointments">
+        <div>
+          <h3>{{ getServiceName(apt.serviceId) }}</h3>
+          <p>{{ getProfessionalName(apt.professionalId) }}</p>
+          <p>{{ apt.date }} · {{ apt.time }}</p>
+        </div>
+        <div class="apt__meta">
+          <span [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+          <button class="btn btn--ghost" type="button" (click)="cancel(apt)" [disabled]="!canCancel(apt.status)">
+            Cancelar
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <div *ngIf="!loading && !appointments.length" class="empty">
+      <p>Aun no tienes citas registradas.</p>
+      <a class="btn btn--primary" routerLink="/book">Reservar ahora</a>
+    </div>
+  </div>
+</section>
+
+

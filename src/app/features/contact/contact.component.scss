@@ -1,0 +1,43 @@
+﻿.section {
+  padding: 48px 0;
+}
+
+.grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: start;
+}
+
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.info {
+  margin-top: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+input,
+textarea {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--taupe);
+  font-family: 'DM Sans', sans-serif;
+}
+
+

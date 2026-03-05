@@ -1,0 +1,150 @@
+﻿.section {
+  padding: 48px 0;
+}
+
+.admin__header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  margin-bottom: 6px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 20px 0 28px;
+}
+
+.tabs button {
+  border: 1px solid var(--taupe);
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.tabs button.active {
+  background: var(--espresso);
+  color: var(--cream);
+  border-color: var(--espresso);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-grid strong {
+  font-size: 24px;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.list__item,
+.apt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.apt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.reschedule {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.reschedule label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tag--confirmed {
+  background: #eaf5ec;
+  color: #1e7e34;
+}
+
+.tag--cancelled {
+  background: #fdecea;
+  color: #9b1c1c;
+}
+
+.tag--attended {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.tag--rescheduled {
+  background: #fff4ed;
+  color: #9a3412;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+.form label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.form input,
+.form select,
+.form textarea {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--taupe);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+

@@ -1,0 +1,55 @@
+﻿<section class="section">
+  <div class="container">
+    <div class="intro">
+      <h1>Acerca de Aura Spa</h1>
+      <p>
+        Somos un espacio de bienestar enfocado en ofrecer experiencias de relajacion y cuidado
+        integral. Nuestro equipo esta comprometido con tu tranquilidad y resultados visibles.
+      </p>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <h3>Mision</h3>
+        <p>
+          Brindar experiencias de bienestar y estetica de alta calidad en un ambiente seguro y
+          sereno, cuidando cada detalle para que nuestros clientes se sientan renovados.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Vision</h3>
+        <p>
+          Ser el spa de referencia en Colombia, reconocido por nuestra excelencia, innovacion y
+          compromiso con el bienestar integral.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Valores</h3>
+        <ul class="values">
+          <li>Respeto y empatia</li>
+          <li>Calidad y detalle</li>
+          <li>Confianza y confidencialidad</li>
+          <li>Bienestar integral</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="history">
+      <h2>Nuestra historia</h2>
+      <p>
+        Aura Spa nacio con el proposito de crear un refugio de calma. Hoy acompañamos a cientos de
+        clientes en su rutina de autocuidado con profesionales certificados y tratamientos
+        personalizados.
+      </p>
+    </div>
+
+    <div class="card contact" *ngIf="company$ | async as company">
+      <h3>Contacto</h3>
+      <p>{{ company.address || 'Cra. 5 #120-45, Bogota' }}</p>
+      <p>{{ company.phone || '+57 300 123 4567' }}</p>
+      <p>{{ company.email || 'info@auraspa.com' }}</p>
+    </div>
+  </div>
+</section>
+
+
