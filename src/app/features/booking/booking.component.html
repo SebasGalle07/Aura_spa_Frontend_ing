@@ -5,7 +5,8 @@
 
     <div class="step">
       <h2>1. Servicio</h2>
-      <div class="cards">
+      <p *ngIf="loadingServices" class="loading">Cargando servicios...</p>
+      <div class="cards" *ngIf="!loadingServices && services.length">
         <button
           type="button"
           class="card selectable"
@@ -18,11 +19,13 @@
           <strong>{{ formatPrice(service.price) }}</strong>
         </button>
       </div>
+      <p *ngIf="!loadingServices && !services.length" class="loading">No hay servicios disponibles.</p>
     </div>
 
     <div class="step" *ngIf="selectedService">
       <h2>2. Profesional</h2>
-      <div class="cards">
+      <p *ngIf="loadingProfessionals" class="loading">Cargando profesionales...</p>
+      <div class="cards" *ngIf="!loadingProfessionals && professionals.length">
         <button
           type="button"
           class="card selectable"
@@ -42,7 +45,7 @@
       <div class="schedule">
         <label>
           Fecha
-          <input type="date" [(ngModel)]="date" [min]="minDate" (change)="loadSlots()" />
+          <input type="date" [(ngModel)]="date" [min]="minDate" (change)="onDateChanged()" (input)="onDateChanged()" />
         </label>
         <div class="slots">
           <p *ngIf="loadingSlots">Cargando horarios...</p>
@@ -105,5 +108,3 @@
     </div>
   </div>
 </section>
-
-

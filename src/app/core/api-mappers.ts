@@ -1,10 +1,32 @@
-﻿import { Appointment, AppointmentHistoryItem, Branding, CompanyData, Professional, Service, User } from './models';
+﻿import { environment } from '../../environments/environment';
+import { Appointment, AppointmentHistoryItem, Branding, CompanyData, Professional, Service, User } from './models';
 
 type AnyRecord = any;
 
 const clean = (obj: Record<string, unknown>): AnyRecord => {
   const entries = Object.entries(obj).filter(([, value]) => value !== undefined);
   return Object.fromEntries(entries) as AnyRecord;
+};
+
+const apiOrigin = (() => {
+  try {
+    return new URL(environment.apiUrl).origin;
+  } catch {
+    return '';
+  }
+})();
+
+const resolveAssetUrl = (value: string | null | undefined): string | null => {
+  if (!value) {
+    return null;
+  }
+  if (/^https?:\/\//i.test(value) || value.startsWith('data:')) {
+    return value;
+  }
+  if (value.startsWith('/')) {
+    return apiOrigin ? `${apiOrigin}${value}` : value;
+  }
+  return value;
 };
 
 export const mapUserFromApi = (data: AnyRecord): User => ({
@@ -32,7 +54,7 @@ export const mapServiceFromApi = (data: AnyRecord): Service => ({
   duration: data.duration,
   price: data.price,
   active: data.active ?? true,
-  image: data.image ?? null,
+  image: resolveAssetUrl(data.image ?? null),
 });
 
 export const mapServiceToApi = (payload: Partial<Service>): AnyRecord =>
@@ -140,12 +162,12 @@ export const mapCompanyToApi = (payload: CompanyData): AnyRecord =>
 export const mapBrandingFromApi = (data: AnyRecord): Branding => {
   const landingImages = data.landing_images ?? data.landingImages;
   return {
-    spLogo: data.sp_logo ?? data.spLogo ?? null,
+    spLogo: resolveAssetUrl(data.sp_logo ?? data.spLogo ?? null),
     landingImages: landingImages
       ? {
-          section1: landingImages.section1 ?? null,
-          section2: landingImages.section2 ?? null,
-          section3: landingImages.section3 ?? null,
+          section1: resolveAssetUrl(landingImages.section1 ?? null),
+          section2: resolveAssetUrl(landingImages.section2 ?? null),
+          section3: resolveAssetUrl(landingImages.section3 ?? null),
         }
       : undefined,
   };
@@ -162,5 +184,3 @@ export const mapBrandingToApi = (payload: Branding): AnyRecord =>
         })
       : undefined,
   });
-
-

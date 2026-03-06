@@ -18,6 +18,7 @@ import { Toast, ToastService } from './core/toast.service';
 })
 export class App implements OnInit, OnDestroy {
   private sub = new Subscription();
+  private toastTimers = new Map<number, ReturnType<typeof setTimeout>>();
   toasts: Array<Toast & { id: number }> = [];
   private toastId = 0;
 
@@ -36,14 +37,18 @@ export class App implements OnInit, OnDestroy {
       this.toast.toast$.subscribe((toast) => {
         const id = ++this.toastId;
         this.toasts = [...this.toasts, { ...toast, id }];
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           this.toasts = this.toasts.filter((item) => item.id !== id);
-        }, 2800);
+          this.toastTimers.delete(id);
+        }, 2500);
+        this.toastTimers.set(id, timer);
       }),
     );
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+    this.toastTimers.forEach((timer) => clearTimeout(timer));
+    this.toastTimers.clear();
   }
 }

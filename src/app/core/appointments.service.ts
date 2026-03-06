@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, map, of, timeout } from 'rxjs';
+import { Observable, catchError, map, of, throwError, timeout } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { Appointment } from './models';
@@ -58,6 +58,9 @@ export class AppointmentsService {
 
   availability(serviceId: number, professionalId: number, date: string): Observable<string[]> {
     const url = `${environment.apiUrl}/availability?service_id=${serviceId}&professional_id=${professionalId}&date=${date}`;
-    return this.http.get<string[]>(url).pipe(timeout(12000), catchError(() => of([])));
+    return this.http.get<string[]>(url).pipe(
+      timeout(15000),
+      catchError((err) => throwError(() => err)),
+    );
   }
 }

@@ -1,10 +1,11 @@
 ﻿import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, NgIf } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 
 import { CompanyService } from '../../core/company.service';
 import { ToastService } from '../../core/toast.service';
+import { ContactService } from '../../core/contact.service';
 import { CompanyData } from '../../core/models';
 
 @Component({
@@ -19,8 +20,9 @@ export class ContactComponent {
   name = '';
   email = '';
   message = '';
+  sending = false;
 
-  constructor(private company: CompanyService, private toast: ToastService) {
+  constructor(private company: CompanyService, private contactApi: ContactService, private toast: ToastService) {
     this.company$ = this.company.company$;
   }
 
@@ -29,11 +31,21 @@ export class ContactComponent {
       this.toast.show('Completa todos los campos.', 'error');
       return;
     }
-    this.toast.show('Gracias. Te contactaremos pronto.', 'success');
-    this.name = '';
-    this.email = '';
-    this.message = '';
+
+    this.sending = true;
+    this.contactApi
+      .sendMessage({ name: this.name, email: this.email, message: this.message })
+      .pipe(finalize(() => (this.sending = false)))
+      .subscribe({
+        next: () => {
+          this.toast.show('Gracias. Te contactaremos pronto.', 'success');
+          this.name = '';
+          this.email = '';
+          this.message = '';
+        },
+        error: (err) => {
+          this.toast.show(err?.error?.detail || 'No fue posible enviar el mensaje.', 'error');
+        },
+      });
   }
 }
-
-

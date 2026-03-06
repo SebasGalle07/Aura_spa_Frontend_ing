@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
@@ -23,7 +23,10 @@ export class ForgotPasswordComponent {
   requestDone = false;
   error = '';
 
-  constructor(private auth: AuthService, private toast: ToastService) {}
+  constructor(private auth: AuthService, private toast: ToastService, route: ActivatedRoute) {
+    this.resetToken = route.snapshot.queryParamMap.get('token') || '';
+    this.requestDone = !!this.resetToken;
+  }
 
   requestReset(): void {
     this.error = '';
@@ -39,7 +42,7 @@ export class ForgotPasswordComponent {
         if (resetToken) {
           this.resetToken = resetToken;
         }
-        this.toast.show('Si el correo existe, se genero un token de recuperacion.', 'info');
+        this.toast.show('Si el correo existe, enviamos instrucciones de recuperacion.', 'info');
       },
       error: (err) => {
         this.loadingRequest = false;

@@ -28,6 +28,8 @@ export class BookingComponent implements OnInit {
   slots: string[] = [];
   selectedTime = '';
   notes = '';
+  loadingServices = true;
+  loadingProfessionals = true;
   loadingSlots = false;
   creating = false;
   createdAppointment?: Appointment;
@@ -45,8 +47,31 @@ export class BookingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.servicesApi.list().subscribe((items) => (this.services = items.filter((item) => item.active)));
-    this.professionalsApi.list().subscribe((items) => (this.professionals = items.filter((item) => item.active)));
+    this.servicesApi
+      .list()
+      .pipe(finalize(() => (this.loadingServices = false)))
+      .subscribe({
+        next: (items) => {
+          this.services = items.filter((item) => item.active);
+        },
+        error: () => {
+          this.services = [];
+          this.toast.show('No fue posible cargar servicios. Intenta de nuevo.', 'error');
+        },
+      });
+
+    this.professionalsApi
+      .list()
+      .pipe(finalize(() => (this.loadingProfessionals = false)))
+      .subscribe({
+        next: (items) => {
+          this.professionals = items.filter((item) => item.active);
+        },
+        error: () => {
+          this.professionals = [];
+          this.toast.show('No fue posible cargar profesionales. Intenta de nuevo.', 'error');
+        },
+      });
 
     const user = this.auth.currentUser;
     if (user) {
@@ -72,6 +97,14 @@ export class BookingComponent implements OnInit {
     this.loadSlots();
   }
 
+  onDateChanged(): void {
+    this.selectedTime = '';
+    this.slots = [];
+    if (this.selectedService && this.selectedProfessional) {
+      this.loadSlots();
+    }
+  }
+
   loadSlots(): void {
     if (!this.selectedService || !this.selectedProfessional || !this.date) {
       return;
@@ -80,8 +113,14 @@ export class BookingComponent implements OnInit {
     this.appointmentsApi
       .availability(this.selectedService.id, this.selectedProfessional.id, this.date)
       .pipe(finalize(() => (this.loadingSlots = false)))
-      .subscribe((slots) => {
-        this.slots = slots;
+      .subscribe({
+        next: (slots) => {
+          this.slots = slots;
+        },
+        error: () => {
+          this.slots = [];
+          this.toast.show('No fue posible cargar horarios. Intenta de nuevo.', 'error');
+        },
       });
   }
 
@@ -109,6 +148,7 @@ export class BookingComponent implements OnInit {
           this.toast.show('Reserva creada con exito.', 'success');
           this.selectedTime = '';
           this.notes = '';
+          this.slots = this.slots.filter((slot) => slot !== apt.time);
         },
         error: (err) => {
           const msg = err?.error?.detail || 'No fue posible crear la cita.';

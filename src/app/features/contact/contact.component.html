@@ -23,9 +23,9 @@
         Mensaje
         <textarea rows="5" [(ngModel)]="message" name="message"></textarea>
       </label>
-      <button class="btn btn--primary" type="submit">Enviar</button>
+      <button class="btn btn--primary" type="submit" [disabled]="sending">
+        {{ sending ? 'Enviando...' : 'Enviar' }}
+      </button>
     </form>
   </div>
 </section>
-
-

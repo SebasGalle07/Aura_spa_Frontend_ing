@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, map, of, shareReplay, tap, timeout } from 'rxjs';
+import { Observable, catchError, map, shareReplay, tap, throwError, timeout } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { Professional } from './models';
@@ -17,12 +17,19 @@ export class ProfessionalsService {
       return this.listCache$;
     }
 
-    this.listCache$ = this.http.get<Professional[]>(`${environment.apiUrl}/professionals`).pipe(
-      timeout(12000),
+    const request$ = this.http.get<Professional[]>(`${environment.apiUrl}/professionals`).pipe(
+      timeout(30000),
       map((items) => items.map((item) => mapProfessionalFromApi(item as unknown as Record<string, unknown>))),
-      catchError(() => of([])),
       shareReplay(1),
     );
+
+    this.listCache$ = request$.pipe(
+      catchError((err) => {
+        this.listCache$ = undefined;
+        return throwError(() => err);
+      }),
+    );
+
     return this.listCache$;
   }
 
