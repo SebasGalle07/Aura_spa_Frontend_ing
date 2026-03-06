@@ -1,7 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
 
 import { AppointmentsService } from '../../core/appointments.service';
 import { ServicesService } from '../../core/services.service';
@@ -30,20 +29,22 @@ export class HistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    forkJoin({
-      appointments: this.appointmentsApi.listMine(),
-      services: this.servicesApi.list(),
-      professionals: this.professionalsApi.list(),
-    }).subscribe({
-      next: ({ appointments, services, professionals }) => {
+    this.appointmentsApi.listMine().subscribe({
+      next: (appointments) => {
         this.appointments = appointments;
-        this.services = services;
-        this.professionals = professionals;
         this.loading = false;
       },
       error: () => {
         this.loading = false;
       },
+    });
+
+    this.servicesApi.list().subscribe((services) => {
+      this.services = services;
+    });
+
+    this.professionalsApi.list().subscribe((professionals) => {
+      this.professionals = professionals;
     });
   }
 
@@ -94,5 +95,3 @@ export class HistoryComponent implements OnInit {
     });
   }
 }
-
-

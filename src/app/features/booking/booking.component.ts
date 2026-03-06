@@ -2,6 +2,7 @@
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { ServicesService } from '../../core/services.service';
 import { ProfessionalsService } from '../../core/professionals.service';
@@ -78,15 +79,9 @@ export class BookingComponent implements OnInit {
     this.loadingSlots = true;
     this.appointmentsApi
       .availability(this.selectedService.id, this.selectedProfessional.id, this.date)
-      .subscribe({
-        next: (slots) => {
-          this.slots = slots;
-          this.loadingSlots = false;
-        },
-        error: () => {
-          this.slots = [];
-          this.loadingSlots = false;
-        },
+      .pipe(finalize(() => (this.loadingSlots = false)))
+      .subscribe((slots) => {
+        this.slots = slots;
       });
   }
 
@@ -107,14 +102,15 @@ export class BookingComponent implements OnInit {
         clientPhone: this.clientPhone,
         notes: this.notes,
       })
+      .pipe(finalize(() => (this.creating = false)))
       .subscribe({
         next: (apt) => {
-          this.creating = false;
           this.createdAppointment = apt;
-          this.toast.show('Cita confirmada.', 'success');
+          this.toast.show('Reserva creada con exito.', 'success');
+          this.selectedTime = '';
+          this.notes = '';
         },
         error: (err) => {
-          this.creating = false;
           const msg = err?.error?.detail || 'No fue posible crear la cita.';
           this.toast.show(msg, 'error');
         },
@@ -137,5 +133,3 @@ export class BookingComponent implements OnInit {
     return `${y}-${m}-${day}`;
   }
 }
-
-

@@ -31,14 +31,14 @@ export class App implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sub.add(this.auth.user$.subscribe((user) => (user ? this.idle.start() : this.idle.stop())));
     this.sub.add(this.auth.restoreSession().subscribe());
-    this.sub.add(this.company.loadPublic().subscribe());
+    this.sub.add(this.company.loadPublic().subscribe({ error: () => {} }));
     this.sub.add(
       this.toast.toast$.subscribe((toast) => {
         const id = ++this.toastId;
         this.toasts = [...this.toasts, { ...toast, id }];
         setTimeout(() => {
           this.toasts = this.toasts.filter((item) => item.id !== id);
-        }, 3500);
+        }, 2800);
       }),
     );
   }
@@ -47,5 +47,3 @@ export class App implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 }
-
-

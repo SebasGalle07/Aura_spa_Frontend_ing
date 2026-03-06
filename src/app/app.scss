@@ -10,12 +10,13 @@
 
 .toast-stack {
   position: fixed;
-  top: 16px;
+  top: 84px;
   right: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 9999;
+  z-index: 95;
+  max-width: min(420px, calc(100vw - 24px));
 }
 
 .toast {
@@ -39,5 +40,3 @@
 .toast--info {
   border-left: 4px solid #1565c0;
 }
-
-
