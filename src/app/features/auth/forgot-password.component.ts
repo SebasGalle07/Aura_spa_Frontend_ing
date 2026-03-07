@@ -1,7 +1,7 @@
 ﻿import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
@@ -22,10 +22,17 @@ export class ForgotPasswordComponent {
   loadingReset = false;
   requestDone = false;
   error = '';
+  hasTokenFromLink = false;
 
-  constructor(private auth: AuthService, private toast: ToastService, route: ActivatedRoute) {
+  constructor(
+    private auth: AuthService,
+    private toast: ToastService,
+    private router: Router,
+    route: ActivatedRoute,
+  ) {
     this.resetToken = route.snapshot.queryParamMap.get('token') || '';
     this.requestDone = !!this.resetToken;
+    this.hasTokenFromLink = !!this.resetToken;
   }
 
   requestReset(): void {
@@ -61,6 +68,7 @@ export class ForgotPasswordComponent {
         this.toast.show('Contrasena actualizada. Ahora puedes iniciar sesion.', 'success');
         this.newPassword = '';
         this.confirmPassword = '';
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.loadingReset = false;
