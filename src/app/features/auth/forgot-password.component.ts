@@ -36,12 +36,9 @@ export class ForgotPasswordComponent {
     }
     this.loadingRequest = true;
     this.auth.forgotPassword(this.email).subscribe({
-      next: ({ resetToken }) => {
+      next: () => {
         this.loadingRequest = false;
         this.requestDone = true;
-        if (resetToken) {
-          this.resetToken = resetToken;
-        }
         this.toast.show('Si el correo existe, enviamos instrucciones de recuperacion.', 'info');
       },
       error: (err) => {
@@ -54,7 +51,7 @@ export class ForgotPasswordComponent {
   submitReset(): void {
     this.error = '';
     if (!this.canReset) {
-      this.error = 'Revisa token y nueva contrasena.';
+      this.error = 'Usa el enlace del correo y completa la nueva contrasena.';
       return;
     }
     this.loadingReset = true;
