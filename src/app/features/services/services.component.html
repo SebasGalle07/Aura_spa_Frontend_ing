@@ -6,7 +6,7 @@
         <p>Selecciona el tratamiento que mejor se adapte a ti.</p>
       </div>
       <div class="filter">
-        <label for="category">Categoria</label>
+        <label for="category">Categoría</label>
         <select id="category" [(ngModel)]="category" (change)="applyFilter()">
           <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
         </select>
@@ -23,7 +23,7 @@
             <span>{{ service.duration }} min</span>
             <strong>{{ formatPrice(service.price) }}</strong>
           </div>
-          <span class="service-card__action">Ver descripcion</span>
+          <span class="service-card__action">Ver descripción</span>
         </div>
       </button>
     </div>
@@ -47,3 +47,4 @@
     </div>
   </article>
 </div>
+

@@ -1,8 +1,8 @@
 ﻿<section class="section">
   <div class="container">
     <div class="admin__header">
-      <h1>Panel admin</h1>
-      <p>Gestion completa de citas, servicios y usuarios.</p>
+      <h1>Panel de administración</h1>
+      <p>Gestión completa de citas, servicios y usuarios.</p>
     </div>
 
     <div class="tabs">
@@ -39,7 +39,7 @@
       </div>
 
       <div class="card" *ngIf="agenda.length">
-        <h3>Agenda del dia</h3>
+        <h3>Agenda del día</h3>
         <div class="list">
           <div class="list__item" *ngFor="let apt of agenda">
             <div>
@@ -87,8 +87,8 @@
         <div class="card form">
           <h3>{{ editingServiceId ? 'Editar servicio' : 'Nuevo servicio' }}</h3>
           <label>Nombre <input type="text" [(ngModel)]="serviceForm.name" /></label>
-          <label>Categoria <input type="text" [(ngModel)]="serviceForm.category" /></label>
-          <label>Duracion (min) <input type="number" [(ngModel)]="serviceForm.duration" /></label>
+          <label>Categoría <input type="text" [(ngModel)]="serviceForm.category" /></label>
+          <label>Duración (min) <input type="number" [(ngModel)]="serviceForm.duration" /></label>
           <label>Precio COP <input type="number" [(ngModel)]="serviceForm.price" /></label>
           <label>Imagen URL <input type="text" [(ngModel)]="serviceForm.image" /></label>
           <label class="checkbox"><input type="checkbox" [(ngModel)]="serviceForm.active" /> Activo</label>
@@ -143,7 +143,7 @@
           <h3>{{ editingUserId ? 'Editar usuario' : 'Nuevo usuario' }}</h3>
           <label>Nombre <input type="text" [(ngModel)]="userForm.name" /></label>
           <label>Correo <input type="email" [(ngModel)]="userForm.email" /></label>
-          <label>Telefono <input type="text" [(ngModel)]="userForm.phone" /></label>
+          <label>Teléfono <input type="text" [(ngModel)]="userForm.phone" /></label>
           <label>Rol
             <select [(ngModel)]="userForm.role">
               <option value="client">Cliente</option>
@@ -151,7 +151,7 @@
               <option value="admin">Administrador</option>
             </select>
           </label>
-          <label>Contrasena <input type="password" [(ngModel)]="userForm.password" /></label>
+          <label>Contraseña <input type="password" [(ngModel)]="userForm.password" /></label>
           <div class="actions">
             <button class="btn btn--primary" type="button" (click)="saveUser()">Guardar</button>
             <button class="btn btn--secondary" type="button" (click)="resetUserForm()">Limpiar</button>
@@ -178,36 +178,79 @@
         <div class="card form">
           <h3>Datos de la empresa</h3>
           <label>Nombre comercial <input type="text" [(ngModel)]="companyForm.businessName" /></label>
-          <label>Razon social <input type="text" [(ngModel)]="companyForm.legalName" /></label>
+          <label>Razón social <input type="text" [(ngModel)]="companyForm.legalName" /></label>
           <label>NIT <input type="text" [(ngModel)]="companyForm.nit" /></label>
-          <label>Direccion <input type="text" [(ngModel)]="companyForm.address" /></label>
+          <label>Dirección <input type="text" [(ngModel)]="companyForm.address" /></label>
           <label>Ciudad <input type="text" [(ngModel)]="companyForm.city" /></label>
-          <label>Telefono <input type="text" [(ngModel)]="companyForm.phone" /></label>
+          <label>Teléfono <input type="text" [(ngModel)]="companyForm.phone" /></label>
           <label>Email <input type="email" [(ngModel)]="companyForm.email" /></label>
           <label>Horario semana inicio <input type="time" [(ngModel)]="companyForm.weekStart" /></label>
           <label>Horario semana fin <input type="time" [(ngModel)]="companyForm.weekEnd" /></label>
-          <label>Horario sabado inicio <input type="time" [(ngModel)]="companyForm.satStart" /></label>
-          <label>Horario sabado fin <input type="time" [(ngModel)]="companyForm.satEnd" /></label>
+          <label>Horario sábado inicio <input type="time" [(ngModel)]="companyForm.satStart" /></label>
+          <label>Horario sábado fin <input type="time" [(ngModel)]="companyForm.satEnd" /></label>
           <label>Horario domingo inicio <input type="time" [(ngModel)]="companyForm.sunStart" /></label>
           <label>Horario domingo fin <input type="time" [(ngModel)]="companyForm.sunEnd" /></label>
           <label>Instagram <input type="text" [(ngModel)]="companyForm.instagram" /></label>
           <label>Facebook <input type="text" [(ngModel)]="companyForm.facebook" /></label>
-          <label>Whatsapp <input type="text" [(ngModel)]="companyForm.whatsapp" /></label>
-          <label>Mensaje bienvenida <textarea rows="3" [(ngModel)]="companyForm.welcomeMsg"></textarea></label>
+          <label>WhatsApp <input type="text" [(ngModel)]="companyForm.whatsapp" /></label>
+          <label>Mensaje de bienvenida <textarea rows="3" [(ngModel)]="companyForm.welcomeMsg"></textarea></label>
           <button class="btn btn--primary" type="button" (click)="saveCompany()">Guardar</button>
         </div>
 
         <div class="card form">
           <h3>Branding</h3>
-          <label>Logo URL <input type="text" [(ngModel)]="brandingForm.spLogo" /></label>
-          <label>Imagen seccion 1 <input type="text" [(ngModel)]="brandingForm.landingImages.section1" /></label>
-          <label>Imagen seccion 2 <input type="text" [(ngModel)]="brandingForm.landingImages.section2" /></label>
-          <label>Imagen seccion 3 <input type="text" [(ngModel)]="brandingForm.landingImages.section3" /></label>
+          <p class="hint">Carga las imágenes desde aquí. La URL se completa automáticamente.</p>
+
+          <div class="branding-field">
+            <label>Logo (encabezado)</label>
+            <input type="text" [(ngModel)]="brandingForm.spLogo" />
+            <label class="file-upload">
+              <span>Subir logo</span>
+              <input type="file" accept="image/*" (change)="uploadBrandingImage($event, 'spLogo')" />
+            </label>
+          </div>
+
+          <div class="branding-field">
+            <label>Imagen principal (inicio)</label>
+            <input type="text" [(ngModel)]="brandingForm.landingImages.section1" />
+            <label class="file-upload">
+              <span>Subir imagen principal</span>
+              <input type="file" accept="image/*" (change)="uploadBrandingImage($event, 'section1')" />
+            </label>
+          </div>
+
+          <div class="branding-field">
+            <label>Imagen de bienestar (inicio)</label>
+            <input type="text" [(ngModel)]="brandingForm.landingImages.section2" />
+            <label class="file-upload">
+              <span>Subir imagen de bienestar</span>
+              <input type="file" accept="image/*" (change)="uploadBrandingImage($event, 'section2')" />
+            </label>
+          </div>
+
+          <div class="branding-field">
+            <label>Foto de fundadores (acerca de)</label>
+            <input type="text" [(ngModel)]="brandingForm.landingImages.section3" />
+            <label class="file-upload">
+              <span>Subir foto de fundadores</span>
+              <input type="file" accept="image/*" (change)="uploadBrandingImage($event, 'section3')" />
+            </label>
+          </div>
+
+          <p class="hint" *ngIf="uploadingBrandingField">Cargando imagen...</p>
+
+          <div class="branding-preview" *ngIf="brandingForm.landingImages.section3">
+            <p>Vista previa de fundadores</p>
+            <img [src]="brandingForm.landingImages.section3" alt="Vista previa de fundadores" />
+          </div>
+
           <button class="btn btn--primary" type="button" (click)="saveBranding()">Guardar branding</button>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+
 
 

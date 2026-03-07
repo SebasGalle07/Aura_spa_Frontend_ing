@@ -3,7 +3,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
 import { Observable } from 'rxjs';
 
 import { CompanyService } from '../../core/company.service';
-import { CompanyData } from '../../core/models';
+import { Branding } from '../../core/models';
 
 @Component({
   selector: 'app-about',
@@ -13,11 +13,10 @@ import { CompanyData } from '../../core/models';
   styleUrl: './about.component.scss',
 })
 export class AboutComponent {
-  company$: Observable<CompanyData | null>;
+  branding$: Observable<Branding | null>;
 
   constructor(private company: CompanyService) {
-    this.company$ = this.company.company$;
+    this.branding$ = this.company.branding$;
   }
 }
-
 

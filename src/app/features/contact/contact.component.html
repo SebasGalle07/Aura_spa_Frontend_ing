@@ -1,12 +1,12 @@
 ﻿<section class="section">
   <div class="container grid">
     <div>
-      <h1>Contactanos</h1>
-      <p>Si tienes preguntas, dejanos tus datos y nos comunicaremos contigo.</p>
+      <h1>Contáctanos</h1>
+      <p>Si tienes preguntas, déjanos tus datos y nos comunicaremos contigo.</p>
       <div class="card info" *ngIf="company$ | async as company">
-        <p>{{ company.address || 'Cra. 5 #120-45, Bogota' }}</p>
-        <p>{{ company.phone || '+57 300 123 4567' }}</p>
-        <p>{{ company.email || 'info@auraspa.com' }}</p>
+        <p>{{ company.address || 'Cra. 5 #120-45, Bogotá' }}</p>
+        <p>{{ company.phone || '+57 300 593 9785' }}</p>
+        <p>{{ company.email || 'elizabeth.mayao@uqvirtual.edu.co' }}</p>
         <a class="btn btn--primary" [href]="whatsappLink(company)" target="_blank" rel="noopener">
           Contactar por WhatsApp
         </a>
@@ -32,3 +32,4 @@
     </form>
   </div>
 </section>
+

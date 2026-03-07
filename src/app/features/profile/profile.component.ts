@@ -76,7 +76,7 @@ export class ProfileComponent implements OnInit {
       return;
     }
     if (this.newPassword !== this.confirmPassword) {
-      this.toast.show('Las contrasenas no coinciden.', 'error');
+      this.toast.show('Las contraseñas no coinciden.', 'error');
       return;
     }
     this.changing = true;
@@ -88,11 +88,11 @@ export class ProfileComponent implements OnInit {
           this.currentPassword = '';
           this.newPassword = '';
           this.confirmPassword = '';
-          this.toast.show('Contrasena actualizada.', 'success');
+          this.toast.show('Contraseña actualizada.', 'success');
         },
         error: (err) => {
           this.changing = false;
-          this.toast.show(err?.error?.detail || 'No fue posible cambiar la contrasena.', 'error');
+          this.toast.show(err?.error?.detail || 'No fue posible cambiar la contraseña.', 'error');
         },
       });
   }
@@ -106,5 +106,7 @@ export class ProfileComponent implements OnInit {
     return role ? labels[role] || role : '';
   }
 }
+
+
 
 

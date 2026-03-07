@@ -3,33 +3,59 @@
     <div class="intro">
       <h1>Acerca de Aura Spa</h1>
       <p>
-        Somos un espacio de bienestar enfocado en ofrecer experiencias de relajacion y cuidado
-        integral. Nuestro equipo esta comprometido con tu tranquilidad y resultados visibles.
+        Somos un espacio de bienestar enfocado en ofrecer experiencias de relajación y cuidado
+        integral. Nuestro equipo está comprometido con tu tranquilidad y con resultados visibles.
       </p>
+    </div>
+
+    <div class="founders">
+      <div class="founders__media">
+        <ng-container *ngIf="branding$ | async as branding; else foundersFallback">
+          <img
+            *ngIf="branding.landingImages?.section3; else foundersFallback"
+            [src]="branding.landingImages?.section3"
+            alt="Fundadores de Aura Spa"
+          />
+        </ng-container>
+        <ng-template #foundersFallback>
+          <div class="founders__placeholder">
+            <span>Foto de fundadores</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <article class="card founders__content">
+        <h2>Nuestros fundadores</h2>
+        <p>
+          Aura Spa nació con la visión de crear un refugio de calma y autocuidado profesional.
+          Nuestro equipo fundador diseñó una experiencia cercana, estética y confiable para cada
+          cliente.
+        </p>
+      </article>
     </div>
 
     <div class="grid">
       <article class="card">
-        <h3>Mision</h3>
+        <h3>Misión</h3>
         <p>
-          Brindar experiencias de bienestar y estetica de alta calidad en un ambiente seguro y
+          Brindar experiencias de bienestar y estética de alta calidad en un ambiente seguro y
           sereno, cuidando cada detalle para que nuestros clientes se sientan renovados.
         </p>
       </article>
       <article class="card">
-        <h3>Vision</h3>
+        <h3>Visión</h3>
         <p>
-          Ser el spa de referencia en Colombia, reconocido por nuestra excelencia, innovacion y
+          Ser el spa de referencia en Colombia, reconocido por nuestra excelencia, innovación y
           compromiso con el bienestar integral.
         </p>
       </article>
       <article class="card">
         <h3>Valores</h3>
         <ul class="values">
-          <li>Respeto y empatia</li>
-          <li>Calidad y detalle</li>
-          <li>Confianza y confidencialidad</li>
-          <li>Bienestar integral</li>
+          <li>Respeto y empatía.</li>
+          <li>Calidad y detalle.</li>
+          <li>Confianza y confidencialidad.</li>
+          <li>Bienestar integral.</li>
         </ul>
       </article>
     </div>
@@ -37,19 +63,10 @@
     <div class="history">
       <h2>Nuestra historia</h2>
       <p>
-        Aura Spa nacio con el proposito de crear un refugio de calma. Hoy acompañamos a cientos de
+        Aura Spa nació con el propósito de crear un refugio de calma. Hoy acompañamos a cientos de
         clientes en su rutina de autocuidado con profesionales certificados y tratamientos
         personalizados.
       </p>
     </div>
-
-    <div class="card contact" *ngIf="company$ | async as company">
-      <h3>Contacto</h3>
-      <p>{{ company.address || 'Cra. 5 #120-45, Bogota' }}</p>
-      <p>{{ company.phone || '+57 300 123 4567' }}</p>
-      <p>{{ company.email || 'info@auraspa.com' }}</p>
-    </div>
   </div>
 </section>
-
-

@@ -38,6 +38,9 @@
           <span>{{ pro.scheduleStart }} - {{ pro.scheduleEnd }}</span>
         </button>
       </div>
+      <p *ngIf="!loadingProfessionals && !professionals.length" class="loading">
+        No hay profesionales disponibles para este servicio.
+      </p>
     </div>
 
     <div class="step" *ngIf="selectedService && selectedProfessional">
@@ -64,7 +67,7 @@
     </div>
 
     <div class="step" *ngIf="selectedTime">
-      <h2>4. Confirmacion</h2>
+      <h2>4. Confirmación</h2>
       <div class="card summary">
         <div>
           <h3>Resumen</h3>
@@ -82,7 +85,7 @@
             <input type="email" [(ngModel)]="clientEmail" />
           </label>
           <label>
-            Telefono
+            Teléfono
             <input type="text" [(ngModel)]="clientPhone" />
           </label>
           <label>
@@ -98,7 +101,7 @@
 
     <div class="success" *ngIf="createdAppointment">
       <h2>Cita confirmada</h2>
-      <p>Tu reserva fue registrada con exito.</p>
+      <p>Tu reserva fue registrada con éxito.</p>
       <div class="success__actions">
         <a class="btn btn--primary" routerLink="/appointments">Ver mis citas</a>
         <button class="btn btn--secondary" type="button" (click)="createdAppointment = undefined">
@@ -108,3 +111,4 @@
     </div>
   </div>
 </section>
+

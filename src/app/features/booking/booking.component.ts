@@ -29,7 +29,7 @@ export class BookingComponent implements OnInit {
   selectedTime = '';
   notes = '';
   loadingServices = true;
-  loadingProfessionals = true;
+  loadingProfessionals = false;
   loadingSlots = false;
   creating = false;
   createdAppointment?: Appointment;
@@ -70,19 +70,6 @@ export class BookingComponent implements OnInit {
         },
       });
 
-    this.professionalsApi
-      .list()
-      .pipe(finalize(() => (this.loadingProfessionals = false)))
-      .subscribe({
-        next: (items) => {
-          this.professionals = items.filter((item) => item.active);
-        },
-        error: () => {
-          this.professionals = [];
-          this.toast.show('No fue posible cargar profesionales. Intenta de nuevo.', 'error');
-        },
-      });
-
     const user = this.auth.currentUser;
     if (user) {
       this.clientName = user.name || '';
@@ -97,6 +84,7 @@ export class BookingComponent implements OnInit {
     this.selectedTime = '';
     this.slots = [];
     this.createdAppointment = undefined;
+    this.loadProfessionalsForService(service.id);
   }
 
   selectProfessional(pro: Professional): void {
@@ -155,7 +143,7 @@ export class BookingComponent implements OnInit {
       .subscribe({
         next: (apt) => {
           this.createdAppointment = apt;
-          this.toast.show('Reserva creada con exito.', 'success');
+          this.toast.show('Reserva creada con éxito.', 'success');
           this.selectedTime = '';
           this.notes = '';
           this.slots = this.slots.filter((slot) => slot !== apt.time);
@@ -173,6 +161,22 @@ export class BookingComponent implements OnInit {
       currency: 'COP',
       maximumFractionDigits: 0,
     }).format(value || 0);
+  }
+
+  private loadProfessionalsForService(serviceId: number): void {
+    this.loadingProfessionals = true;
+    this.professionalsApi
+      .list(false, serviceId)
+      .pipe(finalize(() => (this.loadingProfessionals = false)))
+      .subscribe({
+        next: (items) => {
+          this.professionals = items.filter((item) => item.active);
+        },
+        error: () => {
+          this.professionals = [];
+          this.toast.show('No fue posible cargar profesionales para este servicio.', 'error');
+        },
+      });
   }
 
   private todayStr(): string {

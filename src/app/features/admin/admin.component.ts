@@ -44,6 +44,7 @@ export class AdminComponent implements OnInit {
     spLogo: '',
     landingImages: { section1: '', section2: '', section3: '' },
   };
+  uploadingBrandingField: 'spLogo' | 'section1' | 'section2' | 'section3' | null = null;
 
   rescheduleId?: number;
   rescheduleDate = '';
@@ -242,7 +243,7 @@ export class AdminComponent implements OnInit {
       });
     } else {
       if (!payload.password) {
-        this.toast.show('La contrasena es obligatoria.', 'error');
+        this.toast.show('La contraseña es obligatoria.', 'error');
         return;
       }
       this.usersApi.create(payload as { password: string } & Partial<User>).subscribe({
@@ -297,6 +298,39 @@ export class AdminComponent implements OnInit {
       error: (err) => this.toast.show(err?.error?.detail || 'No fue posible actualizar.', 'error'),
     });
   }
+
+  uploadBrandingImage(event: Event, field: 'spLogo' | 'section1' | 'section2' | 'section3'): void {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    this.uploadingBrandingField = field;
+    this.companyApi.uploadBrandingImage(file).subscribe({
+      next: ({ url }) => {
+        if (field === 'spLogo') {
+          this.brandingForm.spLogo = url;
+        } else {
+          this.brandingForm.landingImages[field] = url;
+        }
+        this.toast.show('Imagen cargada correctamente.', 'success');
+        this.uploadingBrandingField = null;
+        if (input) {
+          input.value = '';
+        }
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'No fue posible cargar la imagen.', 'error');
+        this.uploadingBrandingField = null;
+        if (input) {
+          input.value = '';
+        }
+      },
+    });
+  }
 }
+
+
 
 

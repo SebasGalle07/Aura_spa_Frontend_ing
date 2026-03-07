@@ -54,7 +54,9 @@ export class ContactComponent {
     const raw = (company?.whatsapp || this.defaultWhatsapp || '').trim();
     const digits = raw.replace(/\D/g, '');
     const phone = digits.startsWith('57') ? digits : `57${digits}`;
-    const text = encodeURIComponent('Hola Aura Spa, quiero informacion de una cita.');
+    const text = encodeURIComponent('Hola Aura Spa, quiero información de una cita.');
     return `https://wa.me/${phone}?text=${text}`;
   }
 }
+
+

@@ -49,7 +49,7 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.loading = false;
-          this.toast.show('Cuenta creada con exito.', 'success');
+          this.toast.show('Cuenta creada con éxito.', 'success');
           this.router.navigate(['/book']);
         },
         error: (err) => {
@@ -90,5 +90,7 @@ export class RegisterComponent {
     );
   }
 }
+
+
 
 

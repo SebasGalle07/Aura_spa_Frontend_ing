@@ -78,16 +78,16 @@ export class ServicesComponent implements OnInit {
 
   describe(service: Service): string {
     const byCategory: Record<string, string> = {
-      masajes: 'Terapia orientada a liberar tension muscular y reducir el estres.',
-      manicure: 'Cuidado estetico de manos con enfoque en limpieza, forma y acabado.',
-      pedicure: 'Tratamiento integral para pies, hidratacion profunda y relajacion.',
-      facial: 'Rutina de limpieza e hidratacion para mejorar textura y luminosidad.',
-      corporal: 'Experiencia para renovar energia, aliviar fatiga y mejorar bienestar.',
+      masajes: 'Terapia orientada a liberar tensión muscular y reducir el estrés.',
+      manicure: 'Cuidado estético de manos con enfoque en limpieza, forma y acabado.',
+      pedicure: 'Tratamiento integral para pies, hidratación profunda y relajación.',
+      facial: 'Rutina de limpieza e hidratación para mejorar textura y luminosidad.',
+      corporal: 'Experiencia para renovar energía, aliviar fatiga y mejorar bienestar.',
     };
     const categoryKey = (service.category || '').trim().toLowerCase();
     return (
       byCategory[categoryKey] ||
-      `Servicio de ${service.category.toLowerCase()} de ${service.duration} minutos con atencion profesional personalizada.`
+      `Servicio de ${service.category.toLowerCase()} de ${service.duration} minutos con atención profesional personalizada.`
     );
   }
 
@@ -98,3 +98,5 @@ export class ServicesComponent implements OnInit {
     }
   }
 }
+
+

@@ -30,9 +30,9 @@ export class CompanyService {
       catchError(() =>
         of({
           businessName: 'Aura Spa',
-          address: 'Cra. 5 #120-45, Bogota',
-          phone: '+57 300 123 4567',
-          email: 'info@auraspa.com',
+          address: 'Cra. 5 #120-45, Bogotá',
+          phone: '+57 300 593 9785',
+          email: 'elizabeth.mayao@uqvirtual.edu.co',
         }),
       ),
       tap((c) => this.companySubject.next(c)),
@@ -79,4 +79,14 @@ export class CompanyService {
       tap((b) => this.brandingSubject.next(b)),
     );
   }
+
+  uploadBrandingImage(file: File): Observable<{ url: string }> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ url: string }>(`${environment.apiUrl}/admin/branding/upload`, form).pipe(
+      timeout(30000),
+    );
+  }
 }
+
+

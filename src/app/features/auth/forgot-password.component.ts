@@ -38,7 +38,7 @@ export class ForgotPasswordComponent {
   requestReset(): void {
     this.error = '';
     if (!this.emailValid) {
-      this.error = 'Ingresa un correo valido.';
+      this.error = 'Ingresa un correo válido.';
       return;
     }
     this.loadingRequest = true;
@@ -46,11 +46,11 @@ export class ForgotPasswordComponent {
       next: () => {
         this.loadingRequest = false;
         this.requestDone = true;
-        this.toast.show('Si el correo existe, enviamos instrucciones de recuperacion.', 'info');
+        this.toast.show('Si el correo existe, enviamos instrucciones de recuperación.', 'info');
       },
       error: (err) => {
         this.loadingRequest = false;
-        this.error = err?.error?.detail || 'No fue posible generar la recuperacion.';
+        this.error = err?.error?.detail || 'No fue posible generar la recuperación.';
       },
     });
   }
@@ -58,21 +58,21 @@ export class ForgotPasswordComponent {
   submitReset(): void {
     this.error = '';
     if (!this.canReset) {
-      this.error = 'Usa el enlace del correo y completa la nueva contrasena.';
+      this.error = 'Usa el enlace del correo y completa la nueva contraseña.';
       return;
     }
     this.loadingReset = true;
     this.auth.resetPassword(this.resetToken, this.newPassword).subscribe({
       next: () => {
         this.loadingReset = false;
-        this.toast.show('Contrasena actualizada. Ahora puedes iniciar sesion.', 'success');
+        this.toast.show('Contraseña actualizada. Ahora puedes iniciar sesión.', 'success');
         this.newPassword = '';
         this.confirmPassword = '';
         this.router.navigate(['/login']);
       },
       error: (err) => {
         this.loadingReset = false;
-        this.error = err?.error?.detail || 'No fue posible restablecer la contrasena.';
+        this.error = err?.error?.detail || 'No fue posible restablecer la contraseña.';
       },
     });
   }
@@ -97,3 +97,5 @@ export class ForgotPasswordComponent {
     return !!this.resetToken && this.passwordMinOk && this.passwordMaxOk && this.passwordsMatch;
   }
 }
+
+

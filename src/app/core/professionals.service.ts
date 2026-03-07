@@ -12,7 +12,14 @@ export class ProfessionalsService {
 
   constructor(private http: HttpClient) {}
 
-  list(forceRefresh = false): Observable<Professional[]> {
+  list(forceRefresh = false, serviceId?: number): Observable<Professional[]> {
+    if (serviceId) {
+      return this.http.get<Professional[]>(`${environment.apiUrl}/professionals`, { params: { service_id: serviceId } }).pipe(
+        timeout(30000),
+        map((items) => items.map((item) => mapProfessionalFromApi(item as unknown as Record<string, unknown>))),
+      );
+    }
+
     if (!forceRefresh && this.listCache$) {
       return this.listCache$;
     }
