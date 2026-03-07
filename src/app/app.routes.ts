@@ -5,7 +5,6 @@ import { AboutComponent } from './features/about/about.component';
 import { ContactComponent } from './features/contact/contact.component';
 import { LoginComponent } from './features/auth/login.component';
 import { RegisterComponent } from './features/auth/register.component';
-import { ForgotPasswordComponent } from './features/auth/forgot-password.component';
 import { BookingComponent } from './features/booking/booking.component';
 import { HistoryComponent } from './features/history/history.component';
 import { ProfileComponent } from './features/profile/profile.component';
@@ -20,7 +19,6 @@ export const routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'book', component: BookingComponent, canActivate: [authGuard] },
   { path: 'appointments', component: HistoryComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },

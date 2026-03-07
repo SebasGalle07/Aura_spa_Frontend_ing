@@ -16,7 +16,6 @@ import { ToastService } from '../../core/toast.service';
 export class LoginComponent {
   email = '';
   password = '';
-  showPassword = false;
   submitted = false;
   touched = {
     email: false,

@@ -86,7 +86,15 @@ export class AdminComponent implements OnInit {
   }
 
   refreshAppointments(): void {
-    this.appointmentsApi.listAll().subscribe((items) => (this.appointments = items));
+    this.appointmentsApi.listAll().subscribe({
+      next: (items) => {
+        this.appointments = items;
+      },
+      error: () => {
+        this.appointments = [];
+        this.toast.show('No fue posible cargar citas del panel.', 'error');
+      },
+    });
   }
 
   getServiceName(serviceId: number): string {

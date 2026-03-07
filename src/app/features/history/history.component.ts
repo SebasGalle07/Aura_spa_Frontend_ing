@@ -36,15 +36,26 @@ export class HistoryComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+        this.toast.show('No fue posible cargar tus citas.', 'error');
       },
     });
 
-    this.servicesApi.list().subscribe((services) => {
-      this.services = services;
+    this.servicesApi.list().subscribe({
+      next: (services) => {
+        this.services = services;
+      },
+      error: () => {
+        this.services = [];
+      },
     });
 
-    this.professionalsApi.list().subscribe((professionals) => {
-      this.professionals = professionals;
+    this.professionalsApi.list().subscribe({
+      next: (professionals) => {
+        this.professionals = professionals;
+      },
+      error: () => {
+        this.professionals = [];
+      },
     });
   }
 

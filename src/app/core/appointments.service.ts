@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, map, of, throwError, timeout } from 'rxjs';
+import { Observable, catchError, map, throwError, timeout } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { Appointment } from './models';
@@ -14,7 +14,7 @@ export class AppointmentsService {
     return this.http.get<Appointment[]>(`${environment.apiUrl}/appointments`).pipe(
       timeout(15000),
       map((items) => items.map((item) => mapAppointmentFromApi(item as unknown as Record<string, unknown>))),
-      catchError(() => of([])),
+      catchError((err) => throwError(() => err)),
     );
   }
 
@@ -22,7 +22,7 @@ export class AppointmentsService {
     return this.http.get<Appointment[]>(`${environment.apiUrl}/appointments/my`).pipe(
       timeout(15000),
       map((items) => items.map((item) => mapAppointmentFromApi(item as unknown as Record<string, unknown>))),
-      catchError(() => of([])),
+      catchError((err) => throwError(() => err)),
     );
   }
 

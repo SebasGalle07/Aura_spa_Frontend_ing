@@ -34,17 +34,7 @@
         </label>
         <label>
           Contrasena
-          <div class="password">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              [(ngModel)]="password"
-              name="password"
-              (blur)="markTouched('password')"
-            />
-            <button type="button" class="toggle" (click)="showPassword = !showPassword">
-              {{ showPassword ? 'Ocultar' : 'Ver' }}
-            </button>
-          </div>
+          <input type="password" [(ngModel)]="password" name="password" (blur)="markTouched('password')" />
           <span class="field-error" *ngIf="(submitted || touched.password) && !password">Campo obligatorio.</span>
         </label>
 
@@ -57,9 +47,6 @@
 
       <p class="auth__footer">
         No tienes cuenta? <a routerLink="/register">Registrate</a>
-      </p>
-      <p class="auth__footer">
-        Olvidaste tu contrasena? <a routerLink="/forgot-password">Recuperar acceso</a>
       </p>
     </div>
   </div>
