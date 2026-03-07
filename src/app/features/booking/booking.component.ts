@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { ServicesService } from '../../core/services.service';
@@ -33,6 +33,7 @@ export class BookingComponent implements OnInit {
   loadingSlots = false;
   creating = false;
   createdAppointment?: Appointment;
+  requestedServiceId: number | null = null;
 
   clientName = '';
   clientEmail = '';
@@ -44,15 +45,24 @@ export class BookingComponent implements OnInit {
     private appointmentsApi: AppointmentsService,
     private auth: AuthService,
     private toast: ToastService,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const raw = params.get('service');
+      const parsed = raw ? Number(raw) : NaN;
+      this.requestedServiceId = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+      this.tryPreselectService();
+    });
+
     this.servicesApi
       .list()
       .pipe(finalize(() => (this.loadingServices = false)))
       .subscribe({
         next: (items) => {
           this.services = items.filter((item) => item.active);
+          this.tryPreselectService();
         },
         error: () => {
           this.services = [];
@@ -171,5 +181,16 @@ export class BookingComponent implements OnInit {
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+  }
+
+  private tryPreselectService(): void {
+    if (!this.requestedServiceId || !this.services.length) {
+      return;
+    }
+    const requested = this.services.find((service) => service.id === this.requestedServiceId);
+    if (requested) {
+      this.selectService(requested);
+      this.requestedServiceId = null;
+    }
   }
 }

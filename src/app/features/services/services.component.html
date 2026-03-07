@@ -14,7 +14,7 @@
     </div>
 
     <div class="cards" *ngIf="!loading; else loadingBlock">
-      <article class="card service-card" *ngFor="let service of filtered">
+      <button type="button" class="card service-card service-card--button" *ngFor="let service of filtered" (click)="openDetails(service)">
         <div class="service-card__image" [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''"></div>
         <div class="service-card__body">
           <h3>{{ service.name }}</h3>
@@ -23,8 +23,9 @@
             <span>{{ service.duration }} min</span>
             <strong>{{ formatPrice(service.price) }}</strong>
           </div>
+          <span class="service-card__action">Ver descripcion</span>
         </div>
-      </article>
+      </button>
     </div>
 
     <ng-template #loadingBlock>
@@ -33,4 +34,16 @@
   </div>
 </section>
 
+<div class="modal-backdrop" *ngIf="detailService as service" (click)="closeDetails()">
+  <article class="card modal" (click)="$event.stopPropagation()">
+    <h2>{{ service.name }}</h2>
+    <p class="modal__category">{{ service.category }} · {{ service.duration }} min</p>
+    <p class="modal__description">{{ describe(service) }}</p>
+    <p class="modal__price">{{ formatPrice(service.price) }}</p>
 
+    <div class="modal__actions">
+      <button type="button" class="btn btn--secondary" (click)="closeDetails()">Cerrar</button>
+      <button type="button" class="btn btn--primary" (click)="reserve(service)">Reservar este servicio</button>
+    </div>
+  </article>
+</div>

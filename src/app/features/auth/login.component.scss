@@ -150,6 +150,15 @@ input {
   font-size: 12px;
 }
 
+.auth__helper {
+  margin: -2px 0 2px;
+  font-size: 12px;
+}
+
+.auth__helper a {
+  text-decoration: underline;
+}
+
 .auth__error {
   color: #b91c1c;
   font-size: 13px;

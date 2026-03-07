@@ -7,6 +7,9 @@
         <p>{{ company.address || 'Cra. 5 #120-45, Bogota' }}</p>
         <p>{{ company.phone || '+57 300 123 4567' }}</p>
         <p>{{ company.email || 'info@auraspa.com' }}</p>
+        <a class="btn btn--primary" [href]="whatsappLink(company)" target="_blank" rel="noopener">
+          Contactar por WhatsApp
+        </a>
       </div>
     </div>
 

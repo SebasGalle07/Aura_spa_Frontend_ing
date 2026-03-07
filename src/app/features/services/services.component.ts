@@ -1,8 +1,10 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, HostListener, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { ServicesService } from '../../core/services.service';
+import { AuthService } from '../../core/auth.service';
 import { Service } from '../../core/models';
 
 @Component({
@@ -18,8 +20,13 @@ export class ServicesComponent implements OnInit {
   categories: string[] = [];
   category = 'Todas';
   loading = true;
+  detailService?: Service;
 
-  constructor(private servicesApi: ServicesService) {}
+  constructor(
+    private servicesApi: ServicesService,
+    private auth: AuthService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.servicesApi.list().subscribe({
@@ -51,6 +58,43 @@ export class ServicesComponent implements OnInit {
       maximumFractionDigits: 0,
     }).format(value || 0);
   }
+
+  openDetails(service: Service): void {
+    this.detailService = service;
+  }
+
+  closeDetails(): void {
+    this.detailService = undefined;
+  }
+
+  reserve(service: Service): void {
+    this.closeDetails();
+    if (this.auth.currentUser) {
+      this.router.navigate(['/book'], { queryParams: { service: service.id } });
+      return;
+    }
+    this.router.navigate(['/login']);
+  }
+
+  describe(service: Service): string {
+    const byCategory: Record<string, string> = {
+      masajes: 'Terapia orientada a liberar tension muscular y reducir el estres.',
+      manicure: 'Cuidado estetico de manos con enfoque en limpieza, forma y acabado.',
+      pedicure: 'Tratamiento integral para pies, hidratacion profunda y relajacion.',
+      facial: 'Rutina de limpieza e hidratacion para mejorar textura y luminosidad.',
+      corporal: 'Experiencia para renovar energia, aliviar fatiga y mejorar bienestar.',
+    };
+    const categoryKey = (service.category || '').trim().toLowerCase();
+    return (
+      byCategory[categoryKey] ||
+      `Servicio de ${service.category.toLowerCase()} de ${service.duration} minutos con atencion profesional personalizada.`
+    );
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.detailService) {
+      this.closeDetails();
+    }
+  }
 }
-
-

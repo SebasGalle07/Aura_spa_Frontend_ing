@@ -37,6 +37,9 @@
           <input type="password" [(ngModel)]="password" name="password" (blur)="markTouched('password')" />
           <span class="field-error" *ngIf="(submitted || touched.password) && !password">Campo obligatorio.</span>
         </label>
+        <p class="auth__helper">
+          <a routerLink="/forgot-password">Olvide mi contrasena</a>
+        </p>
 
         <p class="auth__error" *ngIf="error">{{ error }}</p>
 
