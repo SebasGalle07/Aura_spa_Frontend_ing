@@ -30,7 +30,7 @@ export class CompanyService {
       catchError(() =>
         of({
           businessName: 'Aura Spa',
-          address: 'Cra. 5 #120-45, Bogotá',
+          address: 'Cra. 14 #21-35, Centro, Armenia, Quindio, Colombia',
           phone: '+57 300 593 9785',
           email: 'elizabeth.mayao@uqvirtual.edu.co',
         }),
@@ -88,5 +88,4 @@ export class CompanyService {
     );
   }
 }
-
 

@@ -1,23 +1,29 @@
-﻿<footer class="footer">
-  <div class="footer__brand">
-    <ng-container *ngIf="branding$ | async as branding">
-      <img *ngIf="branding.spLogo" [src]="branding.spLogo" alt="Aura Spa" />
-    </ng-container>
-    <div>
-      <h3>Aura Spa</h3>
-      <p>Bienestar que transforma</p>
+<footer class="footer">
+  <div class="container footer__content">
+    <div class="footer__brand">
+      <ng-container *ngIf="branding$ | async as branding">
+        <img *ngIf="branding.spLogo" [src]="branding.spLogo" alt="Aura Spa" />
+      </ng-container>
+      <div>
+        <h3>Aura Spa</h3>
+        <p>Bienestar que transforma</p>
+      </div>
+    </div>
+
+    <div class="footer__info" *ngIf="company$ | async as company">
+      <h4>Atencion y ubicacion</h4>
+      <p>{{ company.address || 'Cra. 14 #21-35, Centro, Armenia, Quindio, Colombia' }}</p>
+      <p>{{ company.phone || '+57 300 593 9785' }}</p>
+      <p>{{ company.email || 'elizabeth.mayao@uqvirtual.edu.co' }}</p>
+    </div>
+
+    <div class="footer__links">
+      <h4>Enlaces rapidos</h4>
+      <a routerLink="/services">Servicios</a>
+      <a routerLink="/contact">Contacto</a>
+      <a routerLink="/about">Acerca de</a>
     </div>
   </div>
 
-  <div class="footer__info" *ngIf="company$ | async as company">
-    <p>{{ company.address || 'Cra. 5 #120-45, Bogotá' }}</p>
-    <p>{{ company.phone || '+57 300 593 9785' }}</p>
-    <p>{{ company.email || 'elizabeth.mayao@uqvirtual.edu.co' }}</p>
-  </div>
-
-  <p class="footer__copy">© 2026 Aura Spa S.A.S. - Todos los derechos reservados.</p>
+  <p class="footer__copy">© 2026 Aura Spa S.A.S. Todos los derechos reservados.</p>
 </footer>
-
-
-
-

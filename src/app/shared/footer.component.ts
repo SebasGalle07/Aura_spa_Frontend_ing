@@ -1,5 +1,6 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { AsyncPipe, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import { CompanyService } from '../core/company.service';
@@ -8,7 +9,7 @@ import { Branding, CompanyData } from '../core/models';
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [AsyncPipe, NgIf],
+  imports: [AsyncPipe, NgIf, RouterLink],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss',
 })
@@ -21,5 +22,3 @@ export class FooterComponent {
     this.branding$ = this.company.branding$;
   }
 }
-
-

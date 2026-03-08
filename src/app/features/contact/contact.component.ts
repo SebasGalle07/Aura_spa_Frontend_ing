@@ -22,6 +22,7 @@ export class ContactComponent {
   message = '';
   sending = false;
   readonly defaultWhatsapp = '3005939785';
+  readonly defaultAddress = 'Cra. 14 #21-35, Centro, Armenia, Quindio, Colombia';
 
   constructor(private company: CompanyService, private contactApi: ContactService, private toast: ToastService) {
     this.company$ = this.company.company$;
@@ -39,7 +40,7 @@ export class ContactComponent {
       .pipe(finalize(() => (this.sending = false)))
       .subscribe({
         next: () => {
-          this.toast.show('Gracias. Te contactaremos pronto.', 'success');
+          this.toast.show('Mensaje enviado al correo de atencion. Te responderemos pronto.', 'success');
           this.name = '';
           this.email = '';
           this.message = '';
@@ -56,6 +57,11 @@ export class ContactComponent {
     const phone = digits.startsWith('57') ? digits : `57${digits}`;
     const text = encodeURIComponent('Hola Aura Spa, quiero información de una cita.');
     return `https://wa.me/${phone}?text=${text}`;
+  }
+
+  mapsLink(address?: string | null): string {
+    const finalAddress = (address || this.defaultAddress).trim();
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(finalAddress)}`;
   }
 }
 

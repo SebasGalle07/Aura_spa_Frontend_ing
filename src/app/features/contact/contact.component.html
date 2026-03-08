@@ -1,12 +1,18 @@
-﻿<section class="section">
+<section class="section">
   <div class="container grid">
     <div>
       <h1>Contáctanos</h1>
-      <p>Si tienes preguntas, déjanos tus datos y nos comunicaremos contigo.</p>
+      <p>
+        Si tienes preguntas, déjanos tus datos y nos comunicaremos contigo. También puedes escribirnos directo por
+        WhatsApp.
+      </p>
       <div class="card info" *ngIf="company$ | async as company">
-        <p>{{ company.address || 'Cra. 5 #120-45, Bogotá' }}</p>
+        <p>{{ company.address || 'Cra. 14 #21-35, Centro, Armenia, Quindío, Colombia' }}</p>
         <p>{{ company.phone || '+57 300 593 9785' }}</p>
         <p>{{ company.email || 'elizabeth.mayao@uqvirtual.edu.co' }}</p>
+        <a class="btn btn--secondary" [href]="mapsLink(company.address)" target="_blank" rel="noopener">
+          Ver ubicación
+        </a>
         <a class="btn btn--primary" [href]="whatsappLink(company)" target="_blank" rel="noopener">
           Contactar por WhatsApp
         </a>
@@ -26,10 +32,12 @@
         Mensaje
         <textarea rows="5" [(ngModel)]="message" name="message"></textarea>
       </label>
+      <p class="hint">
+        Al enviar, el mensaje se remite al correo de atención del negocio configurado en administración.
+      </p>
       <button class="btn btn--primary" type="submit" [disabled]="sending">
         {{ sending ? 'Enviando...' : 'Enviar' }}
       </button>
     </form>
   </div>
 </section>
-
