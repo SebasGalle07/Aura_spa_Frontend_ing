@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { NavbarComponent } from './shared/navbar.component';
 import { FooterComponent } from './shared/footer.component';
+import { AccessibilityPanelComponent } from './shared/accessibility-panel.component';
 import { AuthService } from './core/auth.service';
 import { IdleService } from './core/idle.service';
 import { CompanyService } from './core/company.service';
@@ -12,7 +13,7 @@ import { Toast, ToastService } from './core/toast.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, NgIf, NgFor, NgClass],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, AccessibilityPanelComponent, NgIf, NgFor, NgClass],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

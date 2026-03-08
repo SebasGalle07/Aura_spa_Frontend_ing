@@ -1,5 +1,30 @@
-﻿:host {
+:host {
   display: block;
+  min-height: 100vh;
+}
+
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: -50px;
+  z-index: 120;
+  background: #0b57d0;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+.a11y-root {
+  filter: var(--a11y-color-filter);
+  transform: scale(var(--a11y-content-scale));
+  transform-origin: top center;
+  width: calc(100% / var(--a11y-content-scale));
   min-height: 100vh;
 }
 

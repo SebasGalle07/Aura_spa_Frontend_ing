@@ -1,0 +1,162 @@
+<button
+  #toggleButton
+  class="a11y-toggle"
+  type="button"
+  aria-label="Herramientas de accesibilidad"
+  [attr.aria-expanded]="open"
+  aria-controls="a11y-panel"
+  (click)="togglePanel()"
+>
+  Accesibilidad
+</button>
+
+<div class="a11y-backdrop" *ngIf="open" (click)="closePanel()" aria-hidden="true"></div>
+
+<aside
+  #panel
+  class="a11y-panel"
+  id="a11y-panel"
+  *ngIf="open"
+  role="dialog"
+  aria-label="Herramientas de accesibilidad"
+  aria-modal="true"
+>
+  <header>
+    <h3>Herramientas de accesibilidad</h3>
+    <button type="button" class="close-btn" aria-label="Cerrar panel" (click)="closePanel()">×</button>
+  </header>
+
+  <div class="a11y-content" *ngIf="settings$ | async as settings">
+    <div class="control-grid">
+      <button
+        #firstControl
+        type="button"
+        [class.active]="settings.darkContrast"
+        [attr.aria-pressed]="settings.darkContrast"
+        (click)="accessibility.setDarkContrast(!settings.darkContrast)"
+      >
+        Contraste oscuro
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.lightContrast"
+        [attr.aria-pressed]="settings.lightContrast"
+        (click)="accessibility.setLightContrast(!settings.lightContrast)"
+      >
+        Contraste claro
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.inverted"
+        [attr.aria-pressed]="settings.inverted"
+        (click)="accessibility.setInverted(!settings.inverted)"
+      >
+        Invertir colores
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.monochrome"
+        [attr.aria-pressed]="settings.monochrome"
+        (click)="accessibility.setMonochrome(!settings.monochrome)"
+      >
+        Monocromo
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.lowSaturation"
+        [attr.aria-pressed]="settings.lowSaturation"
+        (click)="accessibility.setLowSaturation(!settings.lowSaturation)"
+      >
+        Baja saturación
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.highSaturation"
+        [attr.aria-pressed]="settings.highSaturation"
+        (click)="accessibility.setHighSaturation(!settings.highSaturation)"
+      >
+        Alta saturación
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.highlightLinks"
+        [attr.aria-pressed]="settings.highlightLinks"
+        (click)="accessibility.setHighlightLinks(!settings.highlightLinks)"
+      >
+        Resaltar enlaces
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.highlightHeadings"
+        [attr.aria-pressed]="settings.highlightHeadings"
+        (click)="accessibility.setHighlightHeadings(!settings.highlightHeadings)"
+      >
+        Resaltar títulos
+      </button>
+      <button
+        type="button"
+        [class.active]="settings.readingMode"
+        [attr.aria-pressed]="settings.readingMode"
+        (click)="accessibility.setReadingMode(!settings.readingMode)"
+      >
+        Modo lectura
+      </button>
+    </div>
+
+    <section class="metric">
+      <h4>Tamaño de fuente</h4>
+      <div class="metric-row">
+        <button type="button" (click)="accessibility.decreaseFontScale()">A-</button>
+        <span>{{ (settings.fontScale * 100).toFixed(0) }}%</span>
+        <button type="button" (click)="accessibility.increaseFontScale()">A+</button>
+      </div>
+    </section>
+
+    <section class="metric">
+      <h4>Escalamiento de contenido</h4>
+      <div class="metric-row">
+        <button type="button" (click)="accessibility.decreaseContentScale()">-</button>
+        <span>{{ (settings.contentScale * 100).toFixed(0) }}%</span>
+        <button type="button" (click)="accessibility.increaseContentScale()">+</button>
+      </div>
+    </section>
+
+    <section class="metric">
+      <h4>Altura de línea</h4>
+      <input
+        type="range"
+        min="1.2"
+        max="2"
+        step="0.1"
+        [value]="settings.lineHeight"
+        (input)="accessibility.setLineHeight(+$any($event.target).value)"
+      />
+    </section>
+
+    <section class="metric">
+      <h4>Espaciado de letras</h4>
+      <input
+        type="range"
+        min="0"
+        max="3"
+        step="0.1"
+        [value]="settings.letterSpacing"
+        (input)="accessibility.setLetterSpacing(+$any($event.target).value)"
+      />
+    </section>
+
+    <section class="metric">
+      <h4>Lectura en voz alta</h4>
+      <button
+        class="read-aloud-btn"
+        type="button"
+        [disabled]="!accessibility.speechSupported"
+        (click)="accessibility.toggleReadAloud()"
+      >
+        {{ (reading$ | async) ? 'Detener lectura' : 'Leer contenido' }}
+      </button>
+    </section>
+
+    <button type="button" class="reset" (click)="accessibility.reset()">Restablecer todo</button>
+  </div>
+</aside>
