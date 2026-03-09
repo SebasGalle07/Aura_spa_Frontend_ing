@@ -93,8 +93,10 @@
 
         <label class="checkbox">
           <input type="checkbox" [(ngModel)]="acceptTerms" name="terms" (blur)="markTouched('terms')" />
-          He le&iacute;do y acepto la
-          <a routerLink="/politica-datos">Pol&iacute;tica de Tratamiento de Datos Personales</a>.
+          <span>
+            He le&iacute;do y acepto la
+            <a routerLink="/politica-datos">Pol&iacute;tica de Tratamiento de Datos Personales</a>.
+          </span>
         </label>
         <span class="field-error" *ngIf="(submitted || touched.terms) && !acceptTerms">Debes aceptar para continuar.</span>
 

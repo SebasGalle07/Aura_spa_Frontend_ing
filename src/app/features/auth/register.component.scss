@@ -136,8 +136,17 @@ input {
 
 .checkbox {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.35;
+}
+
+.checkbox input {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  flex: 0 0 auto;
 }
 
 .checkbox a {
