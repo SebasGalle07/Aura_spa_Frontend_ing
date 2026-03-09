@@ -56,4 +56,22 @@ export class ServicesService {
       .delete<{ ok: boolean }>(`${environment.apiUrl}/services/${id}?soft=true`)
       .pipe(tap(() => (this.listCache$ = undefined)));
   }
+
+  uploadImage(id: number, file: File): Observable<Service> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<Service>(`${environment.apiUrl}/services/${id}/image`, form).pipe(
+      timeout(30000),
+      map((item) => mapServiceFromApi(item as unknown as Record<string, unknown>)),
+      tap(() => (this.listCache$ = undefined)),
+    );
+  }
+
+  removeImage(id: number): Observable<Service> {
+    return this.http.delete<Service>(`${environment.apiUrl}/services/${id}/image`).pipe(
+      timeout(15000),
+      map((item) => mapServiceFromApi(item as unknown as Record<string, unknown>)),
+      tap(() => (this.listCache$ = undefined)),
+    );
+  }
 }

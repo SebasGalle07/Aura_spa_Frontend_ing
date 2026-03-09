@@ -140,6 +140,12 @@ input {
   gap: 8px;
 }
 
+.checkbox a {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
 .hint {
   font-size: 11px;
   color: #6b5446;
@@ -172,4 +178,45 @@ input {
   .auth__card {
     margin-left: 0;
   }
+}
+
+
+.auth__helper {
+  margin: -2px 0 2px;
+  font-size: 12px;
+}
+
+.auth__separator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #8a7365;
+  font-size: 12px;
+  margin: 6px 0;
+}
+
+.auth__separator::before,
+.auth__separator::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid #dfd0c2;
+}
+
+.auth__google {
+  display: grid;
+  gap: 8px;
+}
+
+.auth__google-title {
+  margin: 0;
+  font-size: 13px;
+}
+
+.google-button {
+  min-height: 44px;
+}
+
+.google-button--disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }

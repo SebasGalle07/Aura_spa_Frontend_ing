@@ -1,4 +1,4 @@
-﻿<section class="section">
+<section class="section">
   <div class="container">
     <div class="admin__header">
       <h1>Panel de administración</h1>
@@ -90,8 +90,9 @@
           <label>Categoría <input type="text" [(ngModel)]="serviceForm.category" /></label>
           <label>Duración (min) <input type="number" [(ngModel)]="serviceForm.duration" /></label>
           <label>Precio COP <input type="number" [(ngModel)]="serviceForm.price" /></label>
-          <label>Imagen URL <input type="text" [(ngModel)]="serviceForm.image" /></label>
+          <label>Imagen URL (solo lectura) <input type="text" [(ngModel)]="serviceForm.image" readonly /></label>
           <label class="checkbox"><input type="checkbox" [(ngModel)]="serviceForm.active" /> Activo</label>
+          <p class="hint">La imagen del servicio se sube desde cada tarjeta de la lista.</p>
           <div class="actions">
             <button class="btn btn--primary" type="button" (click)="saveService()">Guardar</button>
             <button class="btn btn--secondary" type="button" (click)="resetServiceForm()">Limpiar</button>
@@ -100,12 +101,37 @@
 
         <div class="list">
           <div class="card item" *ngFor="let service of services">
-            <div>
+            <div class="item__left">
+              <img
+                class="service-thumb"
+                *ngIf="service.image; else noServiceImage"
+                [src]="service.image"
+                [alt]="'Imagen de ' + service.name"
+              />
+              <ng-template #noServiceImage>
+                <div class="service-thumb service-thumb--placeholder">Sin imagen</div>
+              </ng-template>
+
               <strong>{{ service.name }}</strong>
               <p>{{ service.category }} · {{ service.duration }} min</p>
             </div>
-            <button class="btn btn--ghost" type="button" (click)="editService(service)">Editar</button>
+            <div class="actions">
+              <label class="file-upload file-upload--compact">
+                <span>Subir imagen</span>
+                <input type="file" accept="image/*" (change)="uploadServiceImage($event, service)" />
+              </label>
+              <button
+                class="btn btn--secondary"
+                type="button"
+                (click)="removeServiceImage(service)"
+                [disabled]="!service.image || uploadingServiceImageId === service.id"
+              >
+                Quitar imagen
+              </button>
+              <button class="btn btn--ghost" type="button" (click)="editService(service)">Editar</button>
+            </div>
           </div>
+          <p class="hint" *ngIf="uploadingServiceImageId">Procesando imagen del servicio...</p>
         </div>
       </div>
     </div>
@@ -143,7 +169,7 @@
           <h3>{{ editingUserId ? 'Editar usuario' : 'Nuevo usuario' }}</h3>
           <label>Nombre <input type="text" [(ngModel)]="userForm.name" /></label>
           <label>Correo <input type="email" [(ngModel)]="userForm.email" /></label>
-          <label>Teléfono <input type="text" [(ngModel)]="userForm.phone" /></label>
+          <label>Teléfono <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="userForm.phone" /></label>
           <label>Rol
             <select [(ngModel)]="userForm.role">
               <option value="client">Cliente</option>
@@ -182,7 +208,7 @@
           <label>NIT <input type="text" [(ngModel)]="companyForm.nit" /></label>
           <label>Dirección <input type="text" [(ngModel)]="companyForm.address" /></label>
           <label>Ciudad <input type="text" [(ngModel)]="companyForm.city" /></label>
-          <label>Teléfono <input type="text" [(ngModel)]="companyForm.phone" /></label>
+          <label>Teléfono <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="companyForm.phone" /></label>
           <label>Email <input type="email" [(ngModel)]="companyForm.email" /></label>
           <label>Horario semana inicio <input type="time" [(ngModel)]="companyForm.weekStart" /></label>
           <label>Horario semana fin <input type="time" [(ngModel)]="companyForm.weekEnd" /></label>
@@ -192,7 +218,7 @@
           <label>Horario domingo fin <input type="time" [(ngModel)]="companyForm.sunEnd" /></label>
           <label>Instagram <input type="text" [(ngModel)]="companyForm.instagram" /></label>
           <label>Facebook <input type="text" [(ngModel)]="companyForm.facebook" /></label>
-          <label>WhatsApp <input type="text" [(ngModel)]="companyForm.whatsapp" /></label>
+          <label>WhatsApp <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="companyForm.whatsapp" /></label>
           <label>Mensaje de bienvenida <textarea rows="3" [(ngModel)]="companyForm.welcomeMsg"></textarea></label>
           <button class="btn btn--primary" type="button" (click)="saveCompany()">Guardar</button>
         </div>

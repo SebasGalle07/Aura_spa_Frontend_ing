@@ -11,11 +11,12 @@ import { CompanyService } from '../../core/company.service';
 import { ToastService } from '../../core/toast.service';
 import { Appointment, Branding, CompanyData, Professional, Service, User } from '../../core/models';
 import { mapAppointmentFromApi } from '../../core/api-mappers';
+import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf],
+  imports: [FormsModule, NgFor, NgIf, DigitsOnlyDirective],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
 })
@@ -32,6 +33,7 @@ export class AdminComponent implements OnInit {
 
   serviceForm: Partial<Service> = { name: '', category: '', duration: 60, price: 0, active: true };
   editingServiceId?: number;
+  uploadingServiceImageId?: number;
 
   professionalForm: Partial<Professional> = { name: '', specialty: '', scheduleStart: '09:00', scheduleEnd: '17:00', active: true };
   editingProfessionalId?: number;
@@ -296,6 +298,54 @@ export class AdminComponent implements OnInit {
     this.companyApi.updateAdminBranding(this.brandingForm).subscribe({
       next: () => this.toast.show('Branding actualizado.', 'success'),
       error: (err) => this.toast.show(err?.error?.detail || 'No fue posible actualizar.', 'error'),
+    });
+  }
+
+  uploadServiceImage(event: Event, service: Service): void {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    this.uploadingServiceImageId = service.id;
+    this.servicesApi.uploadImage(service.id, file).subscribe({
+      next: (updated) => {
+        this.services = this.services.map((item) => (item.id === updated.id ? updated : item));
+        if (this.editingServiceId === updated.id) {
+          this.serviceForm = { ...updated };
+        }
+        this.toast.show('Imagen del servicio cargada.', 'success');
+        this.uploadingServiceImageId = undefined;
+        if (input) {
+          input.value = '';
+        }
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'No fue posible cargar la imagen.', 'error');
+        this.uploadingServiceImageId = undefined;
+        if (input) {
+          input.value = '';
+        }
+      },
+    });
+  }
+
+  removeServiceImage(service: Service): void {
+    this.uploadingServiceImageId = service.id;
+    this.servicesApi.removeImage(service.id).subscribe({
+      next: (updated) => {
+        this.services = this.services.map((item) => (item.id === updated.id ? updated : item));
+        if (this.editingServiceId === updated.id) {
+          this.serviceForm = { ...updated };
+        }
+        this.toast.show('Imagen del servicio eliminada.', 'success');
+        this.uploadingServiceImageId = undefined;
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'No fue posible eliminar la imagen.', 'error');
+        this.uploadingServiceImageId = undefined;
+      },
     });
   }
 

@@ -30,7 +30,7 @@
         </label>
         <label>
           Teléfono
-          <input type="text" [(ngModel)]="phone" />
+          <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="phone" />
         </label>
         <p class="role">Rol: {{ roleLabel(user.role) }}</p>
         <button class="btn btn--primary" type="button" (click)="saveProfile()" [disabled]="saving">

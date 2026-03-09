@@ -1,13 +1,13 @@
-﻿<section class="auth">
+<section class="auth">
   <div class="container auth__grid">
     <aside class="auth__panel">
       <p class="eyebrow">Aura Spa</p>
       <h2>Bienvenido de nuevo</h2>
       <p>Ingresa para gestionar tus citas, revisar tu historial y reservar en minutos.</p>
       <ul class="benefits">
-        <li>Acceso rápido a tus reservas.</li>
+        <li>Acceso rapido a tus reservas.</li>
         <li>Confirmaciones y recordatorios centralizados.</li>
-        <li>Atención personalizada con nuestro equipo.</li>
+        <li>Atencion personalizada con nuestro equipo.</li>
       </ul>
       <div class="trust">
         <div>
@@ -16,29 +16,29 @@
         </div>
         <div>
           <strong>Soporte</strong>
-          <span>en línea</span>
+          <span>en linea</span>
         </div>
       </div>
     </aside>
 
     <div class="card auth__card">
-      <h1>Iniciar sesión</h1>
-      <p>Ingresa con tu correo y contraseña.</p>
+      <h1>Iniciar sesion</h1>
+      <p>Ingresa con tu correo y contrasena.</p>
 
       <form (ngSubmit)="submit()" class="auth__form">
         <label>
           Correo
           <input type="email" [(ngModel)]="email" name="email" (blur)="markTouched('email')" />
           <span class="field-error" *ngIf="(submitted || touched.email) && !email">Campo obligatorio.</span>
-          <span class="field-error" *ngIf="(submitted || touched.email) && email && !emailValid">Correo inválido.</span>
+          <span class="field-error" *ngIf="(submitted || touched.email) && email && !emailValid">Correo invalido.</span>
         </label>
         <label>
-          Contraseña
+          Contrasena
           <input type="password" [(ngModel)]="password" name="password" (blur)="markTouched('password')" />
           <span class="field-error" *ngIf="(submitted || touched.password) && !password">Campo obligatorio.</span>
         </label>
         <p class="auth__helper">
-          <a routerLink="/forgot-password">Olvidé mi contraseña</a>
+          <a routerLink="/forgot-password">Olvide mi contrasena</a>
         </p>
 
         <p class="auth__error" *ngIf="error">{{ error }}</p>
@@ -48,10 +48,19 @@
         </button>
       </form>
 
+      <div class="auth__separator" *ngIf="googleEnabled">
+        <span>o</span>
+      </div>
+
+      <div class="auth__google" *ngIf="googleEnabled">
+        <p class="auth__google-title">Continuar con Google</p>
+        <div #googleButtonHost class="google-button" [class.google-button--disabled]="googleLoading || !googleReady"></div>
+        <p class="auth__helper" *ngIf="googleLoading">Validando cuenta de Google...</p>
+      </div>
+
       <p class="auth__footer">
-        ¿No tienes cuenta? <a routerLink="/register">Regístrate</a>
+        No tienes cuenta? <a routerLink="/register">Registrate</a>
       </p>
     </div>
   </div>
 </section>
-

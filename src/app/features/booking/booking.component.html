@@ -1,28 +1,27 @@
-﻿<section class="section">
+<section class="section">
   <div class="container">
     <h1>Reservar cita</h1>
     <p class="lead">Selecciona el servicio, el profesional y el horario que prefieras.</p>
 
-    <div class="step">
+    <div class="step" id="step-service">
       <h2>1. Servicio</h2>
       <p *ngIf="loadingServices" class="loading">Cargando servicios...</p>
       <div class="cards" *ngIf="!loadingServices && services.length">
-        <button
-          type="button"
-          class="card selectable"
-          *ngFor="let service of services"
-          [class.is-selected]="selectedService?.id === service.id"
-          (click)="selectService(service)"
-        >
+        <article class="card selectable" *ngFor="let service of services" [class.is-selected]="selectedService?.id === service.id">
+          <div class="selectable__image" [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''"></div>
           <h3>{{ service.name }}</h3>
           <p>{{ service.category }} · {{ service.duration }} min</p>
           <strong>{{ formatPrice(service.price) }}</strong>
-        </button>
+          <div class="selectable__actions">
+            <button type="button" class="btn btn--secondary" (click)="openDetails(service)">Ver descripción</button>
+            <button type="button" class="btn btn--primary" (click)="selectService(service)">Seleccionar</button>
+          </div>
+        </article>
       </div>
       <p *ngIf="!loadingServices && !services.length" class="loading">No hay servicios disponibles.</p>
     </div>
 
-    <div class="step" *ngIf="selectedService">
+    <div class="step" *ngIf="selectedService" id="step-professional">
       <h2>2. Profesional</h2>
       <p *ngIf="loadingProfessionals" class="loading">Cargando profesionales...</p>
       <div class="cards" *ngIf="!loadingProfessionals && professionals.length">
@@ -43,7 +42,7 @@
       </p>
     </div>
 
-    <div class="step" *ngIf="selectedService && selectedProfessional">
+    <div class="step" *ngIf="selectedService && selectedProfessional" id="step-schedule">
       <h2>3. Fecha y hora</h2>
       <div class="schedule">
         <label>
@@ -58,7 +57,7 @@
             *ngFor="let slot of slots"
             class="slot"
             [class.is-selected]="selectedTime === slot"
-            (click)="selectedTime = slot"
+            (click)="selectTime(slot)"
           >
             {{ slot }}
           </button>
@@ -66,7 +65,7 @@
       </div>
     </div>
 
-    <div class="step" *ngIf="selectedTime">
+    <div class="step" *ngIf="selectedTime" id="step-confirmation">
       <h2>4. Confirmación</h2>
       <div class="card summary">
         <div>
@@ -86,7 +85,7 @@
           </label>
           <label>
             Teléfono
-            <input type="text" [(ngModel)]="clientPhone" />
+            <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="clientPhone" />
           </label>
           <label>
             Observaciones
@@ -112,3 +111,16 @@
   </div>
 </section>
 
+<div class="modal-backdrop" *ngIf="detailService as service" (click)="closeDetails()">
+  <article class="card modal" (click)="$event.stopPropagation()">
+    <h2>{{ service.name }}</h2>
+    <p class="modal__category">{{ service.category }} · {{ service.duration }} min</p>
+    <div class="modal__image" [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''"></div>
+    <p class="modal__description">{{ describe(service) }}</p>
+    <p class="modal__price">{{ formatPrice(service.price) }}</p>
+    <div class="modal__actions">
+      <button type="button" class="btn btn--secondary" (click)="closeDetails()">Cerrar</button>
+      <button type="button" class="btn btn--primary" (click)="selectFromDetails(service)">Seleccionar y continuar</button>
+    </div>
+  </article>
+</div>

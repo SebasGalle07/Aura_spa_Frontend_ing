@@ -10,11 +10,12 @@ import { AppointmentsService } from '../../core/appointments.service';
 import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
 import { Appointment, Professional, Service } from '../../core/models';
+import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
 
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf, RouterLink],
+  imports: [FormsModule, NgFor, NgIf, RouterLink, DigitsOnlyDirective],
   templateUrl: './booking.component.html',
   styleUrl: './booking.component.scss',
 })
@@ -22,6 +23,7 @@ export class BookingComponent implements OnInit {
   services: Service[] = [];
   professionals: Professional[] = [];
   selectedService?: Service;
+  detailService?: Service;
   selectedProfessional?: Professional;
   minDate = this.todayStr();
   date = this.minDate;
@@ -80,11 +82,13 @@ export class BookingComponent implements OnInit {
 
   selectService(service: Service): void {
     this.selectedService = service;
+    this.detailService = undefined;
     this.selectedProfessional = undefined;
     this.selectedTime = '';
     this.slots = [];
     this.createdAppointment = undefined;
     this.loadProfessionalsForService(service.id);
+    this.scrollToStep('step-professional');
   }
 
   selectProfessional(pro: Professional): void {
@@ -93,6 +97,7 @@ export class BookingComponent implements OnInit {
     this.slots = [];
     this.createdAppointment = undefined;
     this.loadSlots();
+    this.scrollToStep('step-schedule');
   }
 
   onDateChanged(): void {
@@ -163,6 +168,40 @@ export class BookingComponent implements OnInit {
     }).format(value || 0);
   }
 
+  openDetails(service: Service): void {
+    this.detailService = service;
+  }
+
+  closeDetails(): void {
+    this.detailService = undefined;
+  }
+
+  selectFromDetails(service: Service): void {
+    this.selectService(service);
+    this.closeDetails();
+  }
+
+  selectTime(slot: string): void {
+    this.selectedTime = slot;
+    this.scrollToStep('step-confirmation');
+  }
+
+  describe(service: Service): string {
+    const byCategory: Record<string, string> = {
+      masajes: 'Terapia orientada a liberar tensión muscular y reducir el estrés.',
+      manicure: 'Cuidado estético de manos con enfoque en limpieza, forma y acabado.',
+      pedicure: 'Tratamiento integral para pies, hidratación profunda y relajación.',
+      facial: 'Rutina de limpieza e hidratación para mejorar textura y luminosidad.',
+      depilacion: 'Procedimiento profesional para remover vello con cuidado de la piel.',
+      corporal: 'Experiencia para renovar energía, aliviar fatiga y mejorar bienestar.',
+    };
+    const categoryKey = (service.category || '').trim().toLowerCase();
+    return (
+      byCategory[categoryKey] ||
+      `Servicio de ${service.category.toLowerCase()} de ${service.duration} minutos con atención profesional personalizada.`
+    );
+  }
+
   private loadProfessionalsForService(serviceId: number): void {
     this.loadingProfessionals = true;
     this.professionalsApi
@@ -196,5 +235,14 @@ export class BookingComponent implements OnInit {
       this.selectService(requested);
       this.requestedServiceId = null;
     }
+  }
+
+  private scrollToStep(stepId: string): void {
+    setTimeout(() => {
+      const element = document.getElementById(stepId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 120);
   }
 }

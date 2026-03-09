@@ -55,6 +55,17 @@ export class AuthService {
       );
   }
 
+
+  loginWithGoogle(idToken: string): Observable<User> {
+    return this.http
+      .post<ApiTokenResponse>(`${environment.apiUrl}/auth/google`, { id_token: idToken })
+      .pipe(
+        map((res) => this.normalizeToken(res)),
+        tap(({ accessToken, refreshToken, user }) => this.setSession(accessToken, user, refreshToken)),
+        map(({ user }) => user),
+      );
+  }
+
   register(payload: { name: string; email: string; phone?: string; password: string }): Observable<User> {
     return this.http
       .post<ApiTokenResponse>(`${environment.apiUrl}/auth/register`, payload)

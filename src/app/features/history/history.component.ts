@@ -35,8 +35,8 @@ export class HistoryComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
+        this.appointments = [];
         this.loading = false;
-        this.toast.show('No fue posible cargar tus citas.', 'error');
       },
     });
 

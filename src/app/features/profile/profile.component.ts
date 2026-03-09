@@ -7,11 +7,12 @@ import { UsersService } from '../../core/users.service';
 import { AppointmentsService } from '../../core/appointments.service';
 import { ToastService } from '../../core/toast.service';
 import { User } from '../../core/models';
+import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule, NgIf],
+  imports: [FormsModule, NgIf, DigitsOnlyDirective],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })

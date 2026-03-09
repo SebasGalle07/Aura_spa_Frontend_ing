@@ -9,7 +9,7 @@
       </p>
       <div class="hero__actions">
         <a class="btn btn--primary" [routerLink]="isLoggedIn ? '/book' : '/login'">Reservar ahora</a>
-        <a class="btn btn--secondary" routerLink="/services">Ver servicios</a>
+        <a class="btn btn--secondary" [routerLink]="isLoggedIn ? '/book' : '/login'">Explorar servicios</a>
       </div>
       <div class="hero__stats">
         <div>
@@ -50,7 +50,7 @@
         <h2>Servicios destacados</h2>
         <p>Tratamientos de alta calidad para cuerpo y mente.</p>
       </div>
-      <a class="btn btn--ghost" routerLink="/services">Ver todos</a>
+      <a class="btn btn--ghost" [routerLink]="isLoggedIn ? '/book' : '/login'">Ver todos</a>
     </div>
 
     <div class="cards" *ngIf="!loading && featured.length; else emptyBlock">

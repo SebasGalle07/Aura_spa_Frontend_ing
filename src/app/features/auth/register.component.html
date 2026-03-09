@@ -1,14 +1,14 @@
-﻿<section class="auth">
+<section class="auth">
   <div class="container auth__grid">
     <aside class="auth__panel">
       <p class="eyebrow">Aura Spa</p>
-      <h2>Tu bienestar empieza aquí</h2>
+      <h2>Tu bienestar empieza aqui</h2>
       <p>
         Crea tu cuenta para reservar citas, gestionar tus tratamientos y recibir confirmaciones
         inmediatas.
       </p>
       <ul class="benefits">
-        <li>Agenda digital con confirmación en minutos.</li>
+        <li>Agenda digital con confirmacion en minutos.</li>
         <li>Profesionales certificados y ambientes seguros.</li>
         <li>Historial y control de tus reservas.</li>
       </ul>
@@ -38,15 +38,15 @@
           Correo
           <input type="email" [(ngModel)]="email" name="email" (blur)="markTouched('email')" />
           <span class="field-error" *ngIf="(submitted || touched.email) && !email">Campo obligatorio.</span>
-          <span class="field-error" *ngIf="(submitted || touched.email) && email && !emailValid">Correo inválido.</span>
+          <span class="field-error" *ngIf="(submitted || touched.email) && email && !emailValid">Correo invalido.</span>
         </label>
         <label>
-          Teléfono
-          <input type="text" [(ngModel)]="phone" name="phone" />
+          Telefono
+          <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="phone" name="phone" />
           <span class="hint">Opcional. Lo usamos para confirmaciones.</span>
         </label>
         <label>
-          Contraseña
+          Contrasena
           <div class="password">
             <input
               [type]="showPassword ? 'text' : 'password'"
@@ -59,19 +59,19 @@
             </button>
           </div>
           <div class="requirements">
-            <span [class.ok]="passwordMinOk">Mínimo 8 caracteres</span>
-            <span [class.ok]="passwordMaxOk">Máximo 72 caracteres</span>
+            <span [class.ok]="passwordMinOk">Minimo 8 caracteres</span>
+            <span [class.ok]="passwordMaxOk">Maximo 72 caracteres</span>
           </div>
           <span class="field-error" *ngIf="(submitted || touched.password) && !password">Campo obligatorio.</span>
           <span class="field-error" *ngIf="(submitted || touched.password) && password && !passwordMinOk">
             Usa al menos 8 caracteres.
           </span>
           <span class="field-error" *ngIf="(submitted || touched.password) && password && !passwordMaxOk">
-            La contraseña es muy larga.
+            La contrasena es muy larga.
           </span>
         </label>
         <label>
-          Confirmar contraseña
+          Confirmar contrasena
           <div class="password">
             <input
               [type]="showConfirm ? 'text' : 'password'"
@@ -84,16 +84,17 @@
             </button>
           </div>
           <span class="field-error" *ngIf="(submitted || touched.confirmPassword) && !confirmPassword">
-            Confirma la contraseña.
+            Confirma la contrasena.
           </span>
           <span class="field-error" *ngIf="(submitted || touched.confirmPassword) && confirmPassword && !passwordsMatch">
-            Las contraseñas no coinciden.
+            Las contrasenas no coinciden.
           </span>
         </label>
 
         <label class="checkbox">
           <input type="checkbox" [(ngModel)]="acceptTerms" name="terms" (blur)="markTouched('terms')" />
-          Acepto los términos y la política de datos.
+          He le&iacute;do y acepto la
+          <a routerLink="/politica-datos">Pol&iacute;tica de Tratamiento de Datos Personales</a>.
         </label>
         <span class="field-error" *ngIf="(submitted || touched.terms) && !acceptTerms">Debes aceptar para continuar.</span>
 
@@ -104,10 +105,19 @@
         </button>
       </form>
 
+      <div class="auth__separator" *ngIf="googleEnabled">
+        <span>o</span>
+      </div>
+
+      <div class="auth__google" *ngIf="googleEnabled">
+        <p class="auth__google-title">Continuar con Google</p>
+        <div #googleButtonHost class="google-button" [class.google-button--disabled]="googleLoading || !googleReady"></div>
+        <p class="auth__helper" *ngIf="googleLoading">Validando cuenta de Google...</p>
+      </div>
+
       <p class="auth__footer">
-        ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+        Ya tienes cuenta? <a routerLink="/login">Inicia sesion</a>
       </p>
     </div>
   </div>
 </section>
-
