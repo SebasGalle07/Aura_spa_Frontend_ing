@@ -1,5 +1,14 @@
-﻿import { environment } from '../../environments/environment';
-import { Appointment, AppointmentHistoryItem, Branding, CompanyData, Professional, Service, User } from './models';
+import { environment } from '../../environments/environment';
+import {
+  Appointment,
+  AppointmentHistoryItem,
+  AppointmentPaymentInitResponse,
+  Branding,
+  CompanyData,
+  Professional,
+  Service,
+  User,
+} from './models';
 
 type AnyRecord = any;
 
@@ -35,6 +44,7 @@ export const mapUserFromApi = (data: AnyRecord): User => ({
   name: data.name,
   phone: data.phone ?? null,
   role: data.role,
+  emailVerified: data.email_verified ?? data.emailVerified ?? true,
   createdAt: data.created_at ?? data.createdAt ?? null,
 });
 
@@ -92,6 +102,7 @@ const mapHistoryItem = (item: AnyRecord): AppointmentHistoryItem => ({
 
 export const mapAppointmentFromApi = (data: AnyRecord): Appointment => ({
   id: data.id,
+  clientUserId: data.client_user_id ?? data.clientUserId ?? null,
   clientName: data.client_name ?? data.clientName,
   clientEmail: data.client_email ?? data.clientEmail,
   clientPhone: data.client_phone ?? data.clientPhone ?? null,
@@ -100,6 +111,17 @@ export const mapAppointmentFromApi = (data: AnyRecord): Appointment => ({
   date: data.date,
   time: data.time,
   status: data.status,
+  paymentStatus: data.payment_status ?? data.paymentStatus ?? 'pending',
+  paymentDueAt: data.payment_due_at ?? data.paymentDueAt ?? null,
+  depositAmount: Number(data.deposit_amount ?? data.depositAmount ?? 0),
+  balanceAmount: Number(data.balance_amount ?? data.balanceAmount ?? 0),
+  paidAmount: Number(data.paid_amount ?? data.paidAmount ?? 0),
+  paidAt: data.paid_at ?? data.paidAt ?? null,
+  paymentMethod: data.payment_method ?? data.paymentMethod ?? null,
+  paymentReference: data.payment_reference ?? data.paymentReference ?? null,
+  paymentTransactionId: data.payment_transaction_id ?? data.paymentTransactionId ?? null,
+  paymentProvider: data.payment_provider ?? data.paymentProvider ?? null,
+  cancelledAt: data.cancelled_at ?? data.cancelledAt ?? null,
   notes: data.notes ?? null,
   history: (data.history ?? []).map(mapHistoryItem),
 });
@@ -115,6 +137,17 @@ export const mapAppointmentCreateToApi = (payload: Partial<Appointment>): AnyRec
     time: payload.time,
     notes: payload.notes ?? undefined,
   });
+
+export const mapAppointmentPaymentInitFromApi = (data: AnyRecord): AppointmentPaymentInitResponse => ({
+  appointmentId: data.appointment_id ?? data.appointmentId,
+  paymentReference: data.payment_reference ?? data.paymentReference,
+  provider: data.provider,
+  amount: Number(data.amount ?? 0),
+  currency: data.currency ?? 'COP',
+  paymentDueAt: data.payment_due_at ?? data.paymentDueAt ?? null,
+  status: data.status,
+  checkoutUrl: data.checkout_url ?? data.checkoutUrl ?? null,
+});
 
 export const mapCompanyFromApi = (data: AnyRecord): CompanyData => ({
   businessName: data.business_name ?? data.businessName ?? null,

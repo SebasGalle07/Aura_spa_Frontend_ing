@@ -1,0 +1,20 @@
+<section class="verify">
+  <div class="container">
+    <div class="card verify__card">
+      <h1>Verificacion de correo</h1>
+
+      <p *ngIf="loading">Validando tu enlace de verificacion...</p>
+
+      <div *ngIf="!loading && success" class="verify__state verify__state--ok">
+        <p>Tu correo fue verificado correctamente.</p>
+        <p>Ya puedes iniciar sesion en Aura Spa.</p>
+        <button class="btn btn--primary" type="button" (click)="goToLogin()">Ir a iniciar sesion</button>
+      </div>
+
+      <div *ngIf="!loading && !success" class="verify__state verify__state--error">
+        <p>{{ error }}</p>
+        <a routerLink="/login" class="verify__link">Volver a iniciar sesion</a>
+      </div>
+    </div>
+  </div>
+</section>

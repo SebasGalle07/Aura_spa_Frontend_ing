@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, throwError, timeout } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { Appointment } from './models';
-import { mapAppointmentCreateToApi, mapAppointmentFromApi } from './api-mappers';
+import { Appointment, AppointmentPaymentInitResponse } from './models';
+import { mapAppointmentCreateToApi, mapAppointmentFromApi, mapAppointmentPaymentInitFromApi } from './api-mappers';
 
 @Injectable({ providedIn: 'root' })
 export class AppointmentsService {
@@ -53,6 +53,20 @@ export class AppointmentsService {
   reschedule(id: number, date: string, time: string): Observable<Appointment> {
     return this.http
       .post<Appointment>(`${environment.apiUrl}/appointments/${id}/reschedule`, { date, time })
+      .pipe(timeout(15000), map((item) => mapAppointmentFromApi(item as unknown as Record<string, unknown>)));
+  }
+
+  initPayment(id: number, method?: string): Observable<AppointmentPaymentInitResponse> {
+    return this.http
+      .post<AppointmentPaymentInitResponse>(`${environment.apiUrl}/appointments/${id}/payments/init`, {
+        method: method || undefined,
+      })
+      .pipe(timeout(15000), map((item) => mapAppointmentPaymentInitFromApi(item as unknown as Record<string, unknown>)));
+  }
+
+  mockApprovePayment(id: number, method = 'mock_card'): Observable<Appointment> {
+    return this.http
+      .post<Appointment>(`${environment.apiUrl}/appointments/${id}/payments/mock-approve`, { method })
       .pipe(timeout(15000), map((item) => mapAppointmentFromApi(item as unknown as Record<string, unknown>)));
   }
 

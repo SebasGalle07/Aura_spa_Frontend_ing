@@ -13,8 +13,28 @@ h1 {
   color: #5a463a;
 }
 
+.page-actions {
+  margin-bottom: 8px;
+}
+
+.back-btn,
+.step-back-btn {
+  padding: 7px 14px;
+}
+
 .step {
   margin-bottom: 32px;
+}
+
+.step__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.step__header h2 {
+  margin: 0;
 }
 
 .cards {

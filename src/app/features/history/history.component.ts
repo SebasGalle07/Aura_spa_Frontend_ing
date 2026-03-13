@@ -1,5 +1,5 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { AppointmentsService } from '../../core/appointments.service';
@@ -11,7 +11,7 @@ import { Appointment, Professional, Service } from '../../core/models';
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [NgFor, NgIf, RouterLink],
+  imports: [NgFor, NgIf, RouterLink, DatePipe],
   templateUrl: './history.component.html',
   styleUrl: './history.component.scss',
 })
@@ -69,9 +69,12 @@ export class HistoryComponent implements OnInit {
 
   statusLabel(status: Appointment['status']): string {
     const labels: Record<string, string> = {
+      pending_payment: 'Pendiente de pago',
       confirmed: 'Confirmada',
+      expired: 'Expirada',
       cancelled: 'Cancelada',
-      attended: 'Atendida',
+      completed: 'Completada',
+      no_show: 'No asistio',
       rescheduled: 'Reprogramada',
     };
     return labels[status] || status;
@@ -79,16 +82,29 @@ export class HistoryComponent implements OnInit {
 
   statusClass(status: Appointment['status']): string {
     const classes: Record<string, string> = {
+      pending_payment: 'tag tag--pending',
       confirmed: 'tag tag--confirmed',
+      expired: 'tag tag--expired',
       cancelled: 'tag tag--cancelled',
-      attended: 'tag tag--attended',
+      completed: 'tag tag--completed',
+      no_show: 'tag tag--no-show',
       rescheduled: 'tag tag--rescheduled',
     };
     return classes[status] || 'tag';
   }
 
   canCancel(status: Appointment['status']): boolean {
-    return status === 'confirmed' || status === 'rescheduled';
+    return status === 'pending_payment' || status === 'confirmed' || status === 'rescheduled';
+  }
+
+  canPay(apt: Appointment): boolean {
+    if (apt.status !== 'pending_payment') {
+      return false;
+    }
+    if (!apt.paymentDueAt) {
+      return true;
+    }
+    return new Date(apt.paymentDueAt).getTime() > Date.now();
   }
 
   cancel(apt: Appointment): void {
@@ -102,6 +118,21 @@ export class HistoryComponent implements OnInit {
       },
       error: (err) => {
         this.toast.show(err?.error?.detail || 'No fue posible cancelar.', 'error');
+      },
+    });
+  }
+
+  payDeposit(apt: Appointment): void {
+    if (!this.canPay(apt)) {
+      return;
+    }
+    this.appointmentsApi.mockApprovePayment(apt.id).subscribe({
+      next: (updated) => {
+        this.appointments = this.appointments.map((item) => (item.id === updated.id ? updated : item));
+        this.toast.show('Pago aprobado. Reserva confirmada.', 'success');
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'No fue posible pagar el anticipo.', 'error');
       },
     });
   }

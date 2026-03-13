@@ -110,9 +110,12 @@ export class AdminComponent implements OnInit {
 
   statusLabel(status: Appointment['status']): string {
     const labels: Record<string, string> = {
+      pending_payment: 'Pendiente de pago',
       confirmed: 'Confirmada',
+      expired: 'Expirada',
       cancelled: 'Cancelada',
-      attended: 'Atendida',
+      completed: 'Completada',
+      no_show: 'No asistio',
       rescheduled: 'Reprogramada',
     };
     return labels[status] || status;
@@ -120,9 +123,12 @@ export class AdminComponent implements OnInit {
 
   statusClass(status: Appointment['status']): string {
     const classes: Record<string, string> = {
+      pending_payment: 'tag tag--pending',
       confirmed: 'tag tag--confirmed',
+      expired: 'tag tag--expired',
       cancelled: 'tag tag--cancelled',
-      attended: 'tag tag--attended',
+      completed: 'tag tag--completed',
+      no_show: 'tag tag--no-show',
       rescheduled: 'tag tag--rescheduled',
     };
     return classes[status] || 'tag';

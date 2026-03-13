@@ -7,8 +7,10 @@ import { environment } from '../../environments/environment';
 export interface AdminSummary {
   date: string;
   today_total: number;
+  pending_payment: number;
   confirmed: number;
-  attended: number;
+  completed: number;
+  expired: number;
   cancelled: number;
   rescheduled: number;
   agenda: any[];

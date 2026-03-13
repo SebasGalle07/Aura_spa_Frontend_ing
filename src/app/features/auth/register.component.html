@@ -31,8 +31,19 @@
       <form (ngSubmit)="submit()" class="auth__form">
         <label>
           Nombre completo
-          <input type="text" [(ngModel)]="name" name="name" (blur)="markTouched('name')" />
+          <input
+            type="text"
+            lettersOnly
+            autocomplete="name"
+            [(ngModel)]="name"
+            name="name"
+            (input)="onNameInput()"
+            (blur)="markTouched('name')"
+          />
           <span class="field-error" *ngIf="(submitted || touched.name) && !name">Campo obligatorio.</span>
+          <span class="field-error" *ngIf="(submitted || touched.name) && name && !nameValid">
+            El nombre solo puede incluir letras.
+          </span>
         </label>
         <label>
           Correo
@@ -61,6 +72,10 @@
           <div class="requirements">
             <span [class.ok]="passwordMinOk">Minimo 8 caracteres</span>
             <span [class.ok]="passwordMaxOk">Maximo 72 caracteres</span>
+            <span [class.ok]="passwordUppercaseOk">1 mayuscula</span>
+            <span [class.ok]="passwordLowercaseOk">1 minuscula</span>
+            <span [class.ok]="passwordDigitOk">1 numero</span>
+            <span [class.ok]="passwordSpecialOk">1 caracter especial</span>
           </div>
           <span class="field-error" *ngIf="(submitted || touched.password) && !password">Campo obligatorio.</span>
           <span class="field-error" *ngIf="(submitted || touched.password) && password && !passwordMinOk">
@@ -68,6 +83,12 @@
           </span>
           <span class="field-error" *ngIf="(submitted || touched.password) && password && !passwordMaxOk">
             La contrasena es muy larga.
+          </span>
+          <span
+            class="field-error"
+            *ngIf="(submitted || touched.password) && password && !(passwordUppercaseOk && passwordLowercaseOk && passwordDigitOk && passwordSpecialOk)"
+          >
+            Debe incluir mayuscula, minuscula, numero y caracter especial.
           </span>
         </label>
         <label>

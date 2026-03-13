@@ -164,6 +164,24 @@ input {
   font-size: 13px;
 }
 
+.auth__verification-help {
+  border: 1px solid #dfd0c2;
+  border-radius: 10px;
+  padding: 10px;
+  background: #faf6f1;
+  display: grid;
+  gap: 8px;
+}
+
+.auth__verification-help p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.auth__verification-help .btn {
+  justify-self: start;
+}
+
 .auth__footer {
   font-size: 13px;
   margin-top: 6px;

@@ -43,6 +43,13 @@
 
         <p class="auth__error" *ngIf="error">{{ error }}</p>
 
+        <div class="auth__verification-help" *ngIf="showResendVerification && emailValid">
+          <p>Tu cuenta aun no esta activada. Revisa tu correo o solicita un nuevo enlace.</p>
+          <button type="button" class="btn btn--ghost" (click)="resendVerification()" [disabled]="resendLoading">
+            {{ resendLoading ? 'Enviando...' : 'Reenviar verificacion' }}
+          </button>
+        </div>
+
         <button class="btn btn--primary" type="submit" [disabled]="loading || !canSubmit">
           {{ loading ? 'Ingresando...' : 'Ingresar' }}
         </button>

@@ -1,5 +1,8 @@
 <section class="section">
   <div class="container">
+    <div class="page-actions">
+      <button class="btn btn--secondary back-btn" type="button" (click)="goBackNavigation()">Volver</button>
+    </div>
     <h1>Reservar cita</h1>
     <p class="lead">Selecciona el servicio, el profesional y el horario que prefieras.</p>
 
@@ -10,10 +13,10 @@
         <article class="card selectable" *ngFor="let service of services" [class.is-selected]="selectedService?.id === service.id">
           <div class="selectable__image" [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''"></div>
           <h3>{{ service.name }}</h3>
-          <p>{{ service.category }} · {{ service.duration }} min</p>
+          <p>{{ service.category }} - {{ service.duration }} min</p>
           <strong>{{ formatPrice(service.price) }}</strong>
           <div class="selectable__actions">
-            <button type="button" class="btn btn--secondary" (click)="openDetails(service)">Ver descripción</button>
+            <button type="button" class="btn btn--secondary" (click)="openDetails(service)">Ver descripcion</button>
             <button type="button" class="btn btn--primary" (click)="selectService(service)">Seleccionar</button>
           </div>
         </article>
@@ -22,7 +25,12 @@
     </div>
 
     <div class="step" *ngIf="selectedService" id="step-professional">
-      <h2>2. Profesional</h2>
+      <div class="step__header">
+        <h2>2. Profesional</h2>
+        <button class="btn btn--secondary step-back-btn" type="button" (click)="backToServiceStep()">
+          Volver
+        </button>
+      </div>
       <p *ngIf="loadingProfessionals" class="loading">Cargando profesionales...</p>
       <div class="cards" *ngIf="!loadingProfessionals && professionals.length">
         <button
@@ -43,11 +51,23 @@
     </div>
 
     <div class="step" *ngIf="selectedService && selectedProfessional" id="step-schedule">
-      <h2>3. Fecha y hora</h2>
+      <div class="step__header">
+        <h2>3. Fecha y hora</h2>
+        <button class="btn btn--secondary step-back-btn" type="button" (click)="backToProfessionalStep()">
+          Volver
+        </button>
+      </div>
       <div class="schedule">
         <label>
           Fecha
-          <input type="date" [(ngModel)]="date" [min]="minDate" (change)="onDateChanged()" (input)="onDateChanged()" />
+          <input
+            type="date"
+            [(ngModel)]="date"
+            [min]="minDate"
+            (change)="onDateChanged()"
+            (input)="onDateChanged()"
+            (ngModelChange)="onClientDataChanged()"
+          />
         </label>
         <div class="slots">
           <p *ngIf="loadingSlots">Cargando horarios...</p>
@@ -66,44 +86,67 @@
     </div>
 
     <div class="step" *ngIf="selectedTime" id="step-confirmation">
-      <h2>4. Confirmación</h2>
+      <div class="step__header">
+        <h2>4. Confirmacion</h2>
+        <button class="btn btn--secondary step-back-btn" type="button" (click)="backToScheduleStep()">
+          Volver
+        </button>
+      </div>
       <div class="card summary">
         <div>
           <h3>Resumen</h3>
           <p>Servicio: {{ selectedService?.name }}</p>
           <p>Profesional: {{ selectedProfessional?.name }}</p>
-          <p>Fecha: {{ date }} · {{ selectedTime }}</p>
+          <p>Fecha: {{ date }} - {{ selectedTime }}</p>
         </div>
         <div class="summary__form">
           <label>
             Nombre
-            <input type="text" [(ngModel)]="clientName" />
+            <input type="text" [(ngModel)]="clientName" (ngModelChange)="onClientDataChanged()" />
           </label>
           <label>
             Correo
-            <input type="email" [(ngModel)]="clientEmail" />
+            <input type="email" [(ngModel)]="clientEmail" (ngModelChange)="onClientDataChanged()" />
           </label>
           <label>
-            Teléfono
-            <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="clientPhone" />
+            Telefono
+            <input
+              type="text"
+              digitsOnly
+              inputmode="numeric"
+              autocomplete="tel"
+              [(ngModel)]="clientPhone"
+              (ngModelChange)="onClientDataChanged()"
+            />
           </label>
           <label>
             Observaciones
-            <textarea rows="3" [(ngModel)]="notes"></textarea>
+            <textarea rows="3" [(ngModel)]="notes" (ngModelChange)="onClientDataChanged()"></textarea>
           </label>
           <button class="btn btn--primary" type="button" (click)="confirmBooking()" [disabled]="creating">
-            {{ creating ? 'Confirmando...' : 'Confirmar cita' }}
+            {{ creating ? 'Creando...' : 'Crear reserva' }}
           </button>
         </div>
       </div>
     </div>
 
-    <div class="success" *ngIf="createdAppointment">
-      <h2>Cita confirmada</h2>
-      <p>Tu reserva fue registrada con éxito.</p>
+    <div class="success" *ngIf="createdAppointment as apt">
+      <h2>{{ apt.status === 'confirmed' || apt.status === 'rescheduled' ? 'Reserva confirmada' : 'Reserva pendiente de pago' }}</h2>
+      <p *ngIf="apt.status === 'confirmed' || apt.status === 'rescheduled'">Tu anticipo fue aprobado y la reserva quedo confirmada.</p>
+      <p *ngIf="apt.status === 'pending_payment'">Tu cupo esta bloqueado temporalmente. Debes pagar el anticipo para confirmar.</p>
+
+      <div class="card" *ngIf="apt.status === 'pending_payment'">
+        <p><strong>Anticipo:</strong> {{ formatPrice(apt.depositAmount || 0) }}</p>
+        <p *ngIf="paymentIntent?.paymentDueAt"><strong>Fecha limite de pago:</strong> {{ paymentIntent?.paymentDueAt | date:'yyyy-MM-dd HH:mm' }}</p>
+        <p *ngIf="isPaymentExpired()">El tiempo de pago vencio. Debes crear una nueva reserva.</p>
+        <button class="btn btn--primary" type="button" (click)="payDeposit()" [disabled]="processingPayment || isPaymentExpired()">
+          {{ processingPayment ? 'Procesando pago...' : 'Pagar anticipo (simulado)' }}
+        </button>
+      </div>
+
       <div class="success__actions">
         <a class="btn btn--primary" routerLink="/appointments">Ver mis citas</a>
-        <button class="btn btn--secondary" type="button" (click)="createdAppointment = undefined">
+        <button class="btn btn--secondary" type="button" (click)="startNewBooking()">
           Nueva reserva
         </button>
       </div>
@@ -114,7 +157,7 @@
 <div class="modal-backdrop" *ngIf="detailService as service" (click)="closeDetails()">
   <article class="card modal" (click)="$event.stopPropagation()">
     <h2>{{ service.name }}</h2>
-    <p class="modal__category">{{ service.category }} · {{ service.duration }} min</p>
+    <p class="modal__category">{{ service.category }} - {{ service.duration }} min</p>
     <div class="modal__image" [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''"></div>
     <p class="modal__description">{{ describe(service) }}</p>
     <p class="modal__price">{{ formatPrice(service.price) }}</p>

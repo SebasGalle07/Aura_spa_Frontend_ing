@@ -88,14 +88,29 @@
   color: #1e7e34;
 }
 
+.tag--pending {
+  background: #fff7e6;
+  color: #9a6700;
+}
+
+.tag--expired {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
 .tag--cancelled {
   background: #fdecea;
   color: #9b1c1c;
 }
 
-.tag--attended {
+.tag--completed {
   background: #eef2ff;
   color: #3730a3;
+}
+
+.tag--no-show {
+  background: #fef2f2;
+  color: #991b1b;
 }
 
 .tag--rescheduled {

@@ -1,7 +1,7 @@
 ﻿.nav {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 120;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -86,7 +86,7 @@
     position: absolute;
     top: 70px;
     right: 16px;
-    z-index: 90;
+    z-index: 130;
     flex-direction: column;
     align-items: flex-start;
     background: #faf7f2;
@@ -110,7 +110,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    z-index: 80;
+    z-index: 110;
     background: transparent;
   }
 }

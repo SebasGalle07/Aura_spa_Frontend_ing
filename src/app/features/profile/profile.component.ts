@@ -27,7 +27,7 @@ export class ProfileComponent implements OnInit {
   confirmPassword = '';
 
   totalAppointments = 0;
-  attendedAppointments = 0;
+  completedAppointments = 0;
 
   saving = false;
   changing = false;
@@ -49,7 +49,7 @@ export class ProfileComponent implements OnInit {
 
     this.appointmentsApi.listMine().subscribe((appointments) => {
       this.totalAppointments = appointments.length;
-      this.attendedAppointments = appointments.filter((apt) => apt.status === 'attended').length;
+      this.completedAppointments = appointments.filter((apt) => apt.status === 'completed').length;
     });
   }
 

@@ -17,6 +17,12 @@ type ApiTokenResponse = {
   user: User;
 };
 
+type ApiRegisterResponse = {
+  ok: boolean;
+  email_verification_required?: boolean;
+  emailVerificationRequired?: boolean;
+};
+
 type ForgotPasswordResponse = {
   ok: boolean;
   reset_token?: string | null;
@@ -55,7 +61,6 @@ export class AuthService {
       );
   }
 
-
   loginWithGoogle(idToken: string): Observable<User> {
     return this.http
       .post<ApiTokenResponse>(`${environment.apiUrl}/auth/google`, { id_token: idToken })
@@ -66,14 +71,23 @@ export class AuthService {
       );
   }
 
-  register(payload: { name: string; email: string; phone?: string; password: string }): Observable<User> {
+  register(payload: { name: string; email: string; phone?: string; password: string }): Observable<{ ok: boolean; emailVerificationRequired: boolean }> {
     return this.http
-      .post<ApiTokenResponse>(`${environment.apiUrl}/auth/register`, payload)
+      .post<ApiRegisterResponse>(`${environment.apiUrl}/auth/register`, payload)
       .pipe(
-        map((res) => this.normalizeToken(res)),
-        tap(({ accessToken, refreshToken, user }) => this.setSession(accessToken, user, refreshToken)),
-        map(({ user }) => user),
+        map((res) => ({
+          ok: res.ok,
+          emailVerificationRequired: res.email_verification_required ?? res.emailVerificationRequired ?? true,
+        })),
       );
+  }
+
+  resendVerification(email: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${environment.apiUrl}/auth/resend-verification`, { email });
+  }
+
+  verifyEmail(token: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${environment.apiUrl}/auth/verify-email`, { token });
   }
 
   refreshAccessToken(): Observable<string> {

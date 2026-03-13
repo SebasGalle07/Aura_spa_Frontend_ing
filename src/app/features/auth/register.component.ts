@@ -7,6 +7,7 @@ import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
 import { environment } from '../../../environments/environment';
 import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
+import { LettersOnlyDirective } from '../../shared/letters-only.directive';
 
 type GoogleCredentialResponse = {
   credential?: string;
@@ -46,7 +47,7 @@ declare global {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [FormsModule, RouterLink, NgIf, DigitsOnlyDirective],
+  imports: [FormsModule, RouterLink, NgIf, DigitsOnlyDirective, LettersOnlyDirective],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
@@ -94,12 +95,12 @@ export class RegisterComponent implements AfterViewInit {
 
     this.loading = true;
     this.auth
-      .register({ name: this.name, email: this.email, phone: this.phone || undefined, password: this.password })
+      .register({ name: this.name.trim(), email: this.email.trim(), phone: this.phone || undefined, password: this.password })
       .subscribe({
         next: () => {
           this.loading = false;
-          this.toast.show('Cuenta creada con exito.', 'success');
-          this.router.navigate(['/book']);
+          this.toast.show('Cuenta creada. Revisa tu correo para activarla.', 'success');
+          this.router.navigate(['/login']);
         },
         error: (err) => {
           this.loading = false;
@@ -110,6 +111,18 @@ export class RegisterComponent implements AfterViewInit {
 
   markTouched(field: keyof RegisterComponent['touched']): void {
     this.touched[field] = true;
+  }
+
+  onNameInput(): void {
+    this.name = this.name
+      .replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ'\-\s]/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trimStart();
+  }
+
+  get nameValid(): boolean {
+    const cleanName = this.name.trim();
+    return !!cleanName && /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '\-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/.test(cleanName);
   }
 
   get emailValid(): boolean {
@@ -124,6 +137,22 @@ export class RegisterComponent implements AfterViewInit {
     return new TextEncoder().encode(this.password).length <= 72;
   }
 
+  get passwordUppercaseOk(): boolean {
+    return /[A-Z]/.test(this.password);
+  }
+
+  get passwordLowercaseOk(): boolean {
+    return /[a-z]/.test(this.password);
+  }
+
+  get passwordDigitOk(): boolean {
+    return /\d/.test(this.password);
+  }
+
+  get passwordSpecialOk(): boolean {
+    return /[^A-Za-z0-9]/.test(this.password);
+  }
+
   get passwordsMatch(): boolean {
     return !!this.password && !!this.confirmPassword && this.password === this.confirmPassword;
   }
@@ -131,9 +160,14 @@ export class RegisterComponent implements AfterViewInit {
   get canSubmit(): boolean {
     return (
       !!this.name &&
+      this.nameValid &&
       this.emailValid &&
       this.passwordMinOk &&
       this.passwordMaxOk &&
+      this.passwordUppercaseOk &&
+      this.passwordLowercaseOk &&
+      this.passwordDigitOk &&
+      this.passwordSpecialOk &&
       this.passwordsMatch &&
       this.acceptTerms
     );

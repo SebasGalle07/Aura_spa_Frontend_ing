@@ -21,12 +21,20 @@
           <strong>{{ summary.today_total }}</strong>
         </div>
         <div class="card">
+          <h3>Pendientes pago</h3>
+          <strong>{{ summary.pending_payment }}</strong>
+        </div>
+        <div class="card">
           <h3>Confirmadas</h3>
           <strong>{{ summary.confirmed }}</strong>
         </div>
         <div class="card">
-          <h3>Atendidas</h3>
-          <strong>{{ summary.attended }}</strong>
+          <h3>Completadas</h3>
+          <strong>{{ summary.completed }}</strong>
+        </div>
+        <div class="card">
+          <h3>Expiradas</h3>
+          <strong>{{ summary.expired }}</strong>
         </div>
         <div class="card">
           <h3>Canceladas</h3>
@@ -276,7 +284,6 @@
     </div>
   </div>
 </section>
-
 
 
 

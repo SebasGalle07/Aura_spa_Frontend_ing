@@ -11,9 +11,13 @@
           <h3>{{ getServiceName(apt.serviceId) }}</h3>
           <p>{{ getProfessionalName(apt.professionalId) }}</p>
           <p>{{ apt.date }} · {{ apt.time }}</p>
+          <p *ngIf="apt.status === 'pending_payment' && apt.paymentDueAt">Pagar antes de: {{ apt.paymentDueAt | date:'yyyy-MM-dd HH:mm' }}</p>
         </div>
         <div class="apt__meta">
           <span [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
+          <button class="btn btn--primary" type="button" (click)="payDeposit(apt)" [disabled]="!canPay(apt)">
+            Pagar anticipo
+          </button>
           <button class="btn btn--ghost" type="button" (click)="cancel(apt)" [disabled]="!canCancel(apt.status)">
             Cancelar
           </button>

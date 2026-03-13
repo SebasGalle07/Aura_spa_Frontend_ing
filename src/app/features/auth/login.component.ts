@@ -61,6 +61,8 @@ export class LoginComponent implements AfterViewInit {
   };
   error = '';
   loading = false;
+  resendLoading = false;
+  showResendVerification = false;
   googleLoading = false;
   googleReady = false;
   readonly googleEnabled = !!environment.googleClientId?.trim();
@@ -77,6 +79,7 @@ export class LoginComponent implements AfterViewInit {
   submit(): void {
     this.submitted = true;
     this.error = '';
+    this.showResendVerification = false;
     if (!this.canSubmit) {
       this.error = 'Revisa los campos obligatorios.';
       return;
@@ -91,6 +94,25 @@ export class LoginComponent implements AfterViewInit {
       error: (err) => {
         this.loading = false;
         this.error = err?.error?.detail || 'Credenciales incorrectas.';
+        this.showResendVerification = (this.error || '').toLowerCase().includes('verificar tu correo');
+      },
+    });
+  }
+
+  resendVerification(): void {
+    if (!this.emailValid || this.resendLoading) {
+      return;
+    }
+
+    this.resendLoading = true;
+    this.auth.resendVerification(this.email).subscribe({
+      next: () => {
+        this.resendLoading = false;
+        this.toast.show('Te enviamos un nuevo correo de verificacion.', 'info');
+      },
+      error: (err) => {
+        this.resendLoading = false;
+        this.error = err?.error?.detail || 'No fue posible reenviar la verificacion.';
       },
     });
   }

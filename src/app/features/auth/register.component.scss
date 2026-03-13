@@ -179,6 +179,13 @@ input {
   font-weight: 600;
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: saturate(0.7);
+}
+
 @media (max-width: 900px) {
   .auth__grid {
     grid-template-columns: 1fr;

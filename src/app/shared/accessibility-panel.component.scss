@@ -3,19 +3,46 @@
   right: 16px;
   bottom: 18px;
   z-index: 110;
-  border: 1px solid var(--sand);
-  background: var(--espresso);
-  color: var(--cream);
+  border: none;
+  width: 58px;
+  height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e88e5;
+  color: #fff;
   border-radius: 999px;
-  padding: 10px 16px;
-  font-weight: 600;
+  padding: 0;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 26px rgba(9, 41, 71, 0.3);
+}
+
+.a11y-toggle:hover {
+  background: #1976d2;
 }
 
 .a11y-toggle:focus-visible {
-  outline: 3px solid #0b57d0;
+  outline: 3px solid #93c5fd;
   outline-offset: 2px;
+}
+
+.a11y-icon {
+  width: 34px;
+  height: 34px;
+  fill: currentColor;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
 }
 
 .a11y-backdrop {
