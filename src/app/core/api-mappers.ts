@@ -100,6 +100,9 @@ const mapHistoryItem = (item: AnyRecord): AppointmentHistoryItem => ({
   at: item.at,
 });
 
+const normalizeAppointmentStatus = (status: string): Appointment['status'] =>
+  status === 'attended' ? 'completed' : (status as Appointment['status']);
+
 export const mapAppointmentFromApi = (data: AnyRecord): Appointment => ({
   id: data.id,
   clientUserId: data.client_user_id ?? data.clientUserId ?? null,
@@ -110,7 +113,7 @@ export const mapAppointmentFromApi = (data: AnyRecord): Appointment => ({
   professionalId: data.professional_id ?? data.professionalId,
   date: data.date,
   time: data.time,
-  status: data.status,
+  status: normalizeAppointmentStatus(String(data.status ?? 'pending_payment')),
   paymentStatus: data.payment_status ?? data.paymentStatus ?? 'pending',
   paymentDueAt: data.payment_due_at ?? data.paymentDueAt ?? null,
   depositAmount: Number(data.deposit_amount ?? data.depositAmount ?? 0),
