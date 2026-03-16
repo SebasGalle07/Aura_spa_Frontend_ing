@@ -169,6 +169,10 @@ export class AuthService {
     }
   }
 
+  syncCurrentUser(user: User): void {
+    this.userSubject.next(user);
+  }
+
   private normalizeToken(res: ApiTokenResponse): TokenResponse {
     const token = res.accessToken || res.access_token || '';
     const refreshToken = res.refreshToken ?? res.refresh_token ?? null;

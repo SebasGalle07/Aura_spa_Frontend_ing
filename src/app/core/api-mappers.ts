@@ -150,6 +150,24 @@ export const mapAppointmentPaymentInitFromApi = (data: AnyRecord): AppointmentPa
   paymentDueAt: data.payment_due_at ?? data.paymentDueAt ?? null,
   status: data.status,
   checkoutUrl: data.checkout_url ?? data.checkoutUrl ?? null,
+  checkoutData: data.checkout_data || data.checkoutData
+    ? {
+        provider: data.checkout_data?.provider ?? data.checkoutData?.provider,
+        publicKey: data.checkout_data?.public_key ?? data.checkoutData?.publicKey ?? null,
+        checkoutUrl: data.checkout_data?.checkout_url ?? data.checkoutData?.checkoutUrl ?? null,
+        amountInCents: Number(data.checkout_data?.amount_in_cents ?? data.checkoutData?.amountInCents ?? 0),
+        currency: data.checkout_data?.currency ?? data.checkoutData?.currency ?? null,
+        reference: data.checkout_data?.reference ?? data.checkoutData?.reference ?? null,
+        integritySignature:
+          data.checkout_data?.integrity_signature ?? data.checkoutData?.integritySignature ?? null,
+        redirectUrl: data.checkout_data?.redirect_url ?? data.checkoutData?.redirectUrl ?? null,
+        expirationTime: data.checkout_data?.expiration_time ?? data.checkoutData?.expirationTime ?? null,
+        customerEmail: data.checkout_data?.customer_email ?? data.checkoutData?.customerEmail ?? null,
+        customerFullName: data.checkout_data?.customer_full_name ?? data.checkoutData?.customerFullName ?? null,
+        customerPhoneNumber:
+          data.checkout_data?.customer_phone_number ?? data.checkoutData?.customerPhoneNumber ?? null,
+      }
+    : null,
 });
 
 export const mapCompanyFromApi = (data: AnyRecord): CompanyData => ({

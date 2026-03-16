@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, throwError, timeout } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { Appointment, AppointmentPaymentInitResponse } from './models';
+import { Appointment, AppointmentPaymentInitResponse, PaymentSyncResponse } from './models';
 import { mapAppointmentCreateToApi, mapAppointmentFromApi, mapAppointmentPaymentInitFromApi } from './api-mappers';
 
 @Injectable({ providedIn: 'root' })
@@ -62,6 +62,28 @@ export class AppointmentsService {
         method: method || undefined,
       })
       .pipe(timeout(15000), map((item) => mapAppointmentPaymentInitFromApi(item as unknown as Record<string, unknown>)));
+  }
+
+  getPaymentCheckoutData(reference: string): Observable<AppointmentPaymentInitResponse> {
+    return this.http
+      .get<AppointmentPaymentInitResponse>(`${environment.apiUrl}/appointments/payments/by-reference/${reference}`)
+      .pipe(timeout(15000), map((item) => mapAppointmentPaymentInitFromApi(item as unknown as Record<string, unknown>)));
+  }
+
+  completeMockPayment(reference: string, status: 'approved' | 'rejected' | 'expired' | 'cancelled', method = 'mock_card'): Observable<Appointment> {
+    return this.http
+      .post<Appointment>(`${environment.apiUrl}/appointments/payments/mock-checkout/complete`, {
+        provider_reference: reference,
+        status,
+        method,
+      })
+      .pipe(timeout(15000), map((item) => mapAppointmentFromApi(item as unknown as Record<string, unknown>)));
+  }
+
+  syncWompiTransaction(transactionId: string, reference: string): Observable<PaymentSyncResponse> {
+    return this.http.get<PaymentSyncResponse>(
+      `${environment.apiUrl}/appointments/payments/wompi/transactions/${transactionId}?reference=${encodeURIComponent(reference)}`,
+    ).pipe(timeout(15000));
   }
 
   mockApprovePayment(id: number, method = 'mock_card'): Observable<Appointment> {

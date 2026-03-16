@@ -87,6 +87,30 @@ export interface AppointmentPaymentInitResponse {
   paymentDueAt?: string | null;
   status: PaymentStatus;
   checkoutUrl?: string | null;
+  checkoutData?: {
+    provider: string;
+    publicKey?: string | null;
+    checkoutUrl?: string | null;
+    amountInCents?: number | null;
+    currency?: string | null;
+    reference?: string | null;
+    integritySignature?: string | null;
+    redirectUrl?: string | null;
+    expirationTime?: string | null;
+    customerEmail?: string | null;
+    customerFullName?: string | null;
+    customerPhoneNumber?: string | null;
+  } | null;
+}
+
+export interface PaymentSyncResponse {
+  ok: boolean;
+  providerReference: string;
+  providerTransactionId?: string | null;
+  providerTransactionStatus?: string | null;
+  appointmentId: number;
+  appointmentStatus: AppointmentStatus;
+  paymentStatus: PaymentStatus;
 }
 
 export interface CompanyData {

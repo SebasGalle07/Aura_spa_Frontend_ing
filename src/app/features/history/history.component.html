@@ -16,9 +16,9 @@
         <div class="apt__meta">
           <span [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
           <button class="btn btn--primary" type="button" (click)="payDeposit(apt)" [disabled]="!canPay(apt)">
-            Pagar anticipo
+            Ir al pago
           </button>
-          <button class="btn btn--ghost" type="button" (click)="cancel(apt)" [disabled]="!canCancel(apt.status)">
+          <button class="btn btn--ghost" type="button" (click)="cancel(apt)" [disabled]="!canCancel(apt)">
             Cancelar
           </button>
         </div>

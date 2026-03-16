@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { AppointmentsService } from '../../core/appointments.service';
 import { ServicesService } from '../../core/services.service';
@@ -26,6 +26,7 @@ export class HistoryComponent implements OnInit {
     private servicesApi: ServicesService,
     private professionalsApi: ProfessionalsService,
     private toast: ToastService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -93,8 +94,15 @@ export class HistoryComponent implements OnInit {
     return classes[status] || 'tag';
   }
 
-  canCancel(status: Appointment['status']): boolean {
-    return status === 'pending_payment' || status === 'confirmed' || status === 'rescheduled';
+  isPastOrStarted(apt: Appointment): boolean {
+    return this.toDateTime(apt).getTime() <= Date.now();
+  }
+
+  canCancel(apt: Appointment): boolean {
+    if (this.isPastOrStarted(apt)) {
+      return false;
+    }
+    return apt.status === 'pending_payment' || apt.status === 'confirmed' || apt.status === 'rescheduled';
   }
 
   canPay(apt: Appointment): boolean {
@@ -108,7 +116,7 @@ export class HistoryComponent implements OnInit {
   }
 
   cancel(apt: Appointment): void {
-    if (!this.canCancel(apt.status)) {
+    if (!this.canCancel(apt)) {
       return;
     }
     this.appointmentsApi.cancel(apt.id).subscribe({
@@ -126,14 +134,19 @@ export class HistoryComponent implements OnInit {
     if (!this.canPay(apt)) {
       return;
     }
-    this.appointmentsApi.mockApprovePayment(apt.id).subscribe({
-      next: (updated) => {
-        this.appointments = this.appointments.map((item) => (item.id === updated.id ? updated : item));
-        this.toast.show('Pago aprobado. Reserva confirmada.', 'success');
+    this.appointmentsApi.initPayment(apt.id).subscribe({
+      next: (paymentIntent) => {
+        this.router.navigate(['/payments/checkout'], {
+          queryParams: { reference: paymentIntent.paymentReference, returnTo: '/appointments' },
+        });
       },
       error: (err) => {
-        this.toast.show(err?.error?.detail || 'No fue posible pagar el anticipo.', 'error');
+        this.toast.show(err?.error?.detail || 'No fue posible iniciar el pago del anticipo.', 'error');
       },
     });
+  }
+
+  private toDateTime(apt: Appointment): Date {
+    return new Date(`${apt.date}T${apt.time}:00`);
   }
 }

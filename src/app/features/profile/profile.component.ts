@@ -62,7 +62,13 @@ export class ProfileComponent implements OnInit {
       next: (user) => {
         this.saving = false;
         this.user = user;
-        this.toast.show('Perfil actualizado.', 'success');
+        this.auth.syncCurrentUser(user);
+        this.toast.show(
+          user.emailVerified === false
+            ? 'Perfil actualizado. Verifica tu nuevo correo para mantener el acceso.'
+            : 'Perfil actualizado.',
+          'success',
+        );
       },
       error: (err) => {
         this.saving = false;

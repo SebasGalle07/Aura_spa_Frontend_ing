@@ -6,6 +6,7 @@ import { LoginComponent } from './features/auth/login.component';
 import { RegisterComponent } from './features/auth/register.component';
 import { ForgotPasswordComponent } from './features/auth/forgot-password.component';
 import { VerifyEmailComponent } from './features/auth/verify-email.component';
+import { MockCheckoutComponent } from './features/payments/mock-checkout.component';
 import { PrivacyPolicyComponent } from './features/legal/privacy-policy.component';
 import { BookingComponent } from './features/booking/booking.component';
 import { HistoryComponent } from './features/history/history.component';
@@ -22,6 +23,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'verify-email', component: VerifyEmailComponent },
+  { path: 'payments/checkout', component: MockCheckoutComponent, canActivate: [authGuard] },
+  { path: 'payments/mock-checkout', redirectTo: 'payments/checkout', pathMatch: 'full' },
   { path: 'politica-datos', component: PrivacyPolicyComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'book', component: BookingComponent, canActivate: [authGuard] },

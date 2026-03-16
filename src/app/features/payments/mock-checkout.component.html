@@ -1,0 +1,87 @@
+<section class="section">
+  <div class="container narrow">
+    <div class="page-actions">
+      <a class="btn btn--secondary" [routerLink]="returnTo">Volver</a>
+    </div>
+
+    <h1>{{ isWompi() ? 'Pago de anticipo' : 'Pago simulado' }}</h1>
+    <p class="lead" *ngIf="!isWompi()">Este entorno academico simula la confirmacion del anticipo para validar el flujo completo de reservas.</p>
+    <p class="lead" *ngIf="isWompi()">Seras redirigido a Wompi en modo de prueba para completar el pago del anticipo con datos sandbox.</p>
+
+    <div class="card checkout" *ngIf="loading">
+      <p>Cargando datos del pago...</p>
+    </div>
+
+    <div class="card checkout checkout--error" *ngIf="!loading && error">
+      <h2>No fue posible continuar</h2>
+      <p>{{ error }}</p>
+    </div>
+
+    <div class="card checkout" *ngIf="!loading && !error && paymentIntent as payment">
+      <div class="checkout__header">
+        <div>
+          <p class="eyebrow">Referencia</p>
+          <strong>{{ payment.paymentReference }}</strong>
+        </div>
+        <span class="tag" [class.tag--pending]="payment.status === 'pending'" [class.tag--confirmed]="payment.status === 'approved'" [class.tag--expired]="payment.status === 'expired'">
+          {{ payment.status }}
+        </span>
+      </div>
+
+      <div class="checkout__details">
+        <p><strong>Reserva:</strong> #{{ payment.appointmentId }}</p>
+        <p><strong>Proveedor:</strong> {{ payment.provider }}</p>
+        <p><strong>Valor del anticipo:</strong> {{ formatPrice(payment.amount) }}</p>
+        <p *ngIf="payment.paymentDueAt"><strong>Fecha limite:</strong> {{ payment.paymentDueAt | date:'yyyy-MM-dd HH:mm' }}</p>
+      </div>
+
+      <p class="checkout__hint" *ngIf="isWompi() && stage !== 'result' && payment.status === 'pending' && !isExpired()">
+        Al continuar se abrira el checkout sandbox de Wompi. La reserva se confirmara solo si Wompi reporta el pago como aprobado.
+      </p>
+      <p class="checkout__hint" *ngIf="!isWompi() && payment.status === 'pending' && !isExpired()">Selecciona el resultado que deseas simular para esta transaccion.</p>
+      <p class="checkout__hint checkout__hint--error" *ngIf="payment.status === 'pending' && isExpired()">
+        El tiempo de retencion ya vencio. Puedes simular la expiracion para cerrar el intento.
+      </p>
+      <p class="checkout__hint" *ngIf="isWompi() && stage === 'result' && !error">
+        Estamos validando con Wompi el resultado de la transaccion.
+      </p>
+
+      <form
+        #wompiForm
+        *ngIf="isWompi() && payment.checkoutData && stage !== 'result'"
+        [attr.action]="payment.checkoutData.checkoutUrl || payment.checkoutUrl"
+        method="GET"
+        class="checkout__wompi"
+      >
+        <input type="hidden" name="public-key" [value]="payment.checkoutData.publicKey || ''" />
+        <input type="hidden" name="currency" [value]="payment.checkoutData.currency || payment.currency" />
+        <input type="hidden" name="amount-in-cents" [value]="payment.checkoutData.amountInCents || 0" />
+        <input type="hidden" name="reference" [value]="payment.checkoutData.reference || payment.paymentReference" />
+        <input type="hidden" name="signature:integrity" [value]="payment.checkoutData.integritySignature || ''" />
+        <input type="hidden" name="redirect-url" [value]="payment.checkoutData.redirectUrl || ''" />
+        <input type="hidden" name="expiration-time" [value]="payment.checkoutData.expirationTime || ''" />
+        <input type="hidden" name="customer-data:email" [value]="payment.checkoutData.customerEmail || ''" />
+        <input type="hidden" name="customer-data:full-name" [value]="payment.checkoutData.customerFullName || ''" />
+        <input type="hidden" name="customer-data:phone-number" [value]="payment.checkoutData.customerPhoneNumber || ''" />
+      </form>
+
+      <div class="checkout__actions" *ngIf="!isWompi()">
+        <button class="btn btn--primary" type="button" (click)="process('approved')" [disabled]="!canSimulatePayment()">
+          {{ processing ? 'Procesando...' : 'Aprobar pago' }}
+        </button>
+        <button class="btn btn--secondary" type="button" (click)="process('rejected')" [disabled]="!canSimulatePayment()">
+          Rechazar pago
+        </button>
+        <button class="btn btn--ghost" type="button" (click)="process('expired')" [disabled]="processing || payment.status !== 'pending'">
+          Marcar expirado
+        </button>
+      </div>
+
+      <div class="checkout__actions" *ngIf="isWompi() && stage !== 'result'">
+        <button class="btn btn--primary" type="button" (click)="continueToGateway()" [disabled]="!canContinueToGateway()">
+          {{ processing ? 'Redirigiendo...' : 'Continuar con Wompi' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

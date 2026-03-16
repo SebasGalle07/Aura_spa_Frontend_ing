@@ -74,6 +74,14 @@ a {
   color: var(--espresso);
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: saturate(0.6);
+}
+
 .card {
   background: white;
   border-radius: 12px;

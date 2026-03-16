@@ -140,7 +140,7 @@
         <p *ngIf="paymentIntent?.paymentDueAt"><strong>Fecha limite de pago:</strong> {{ paymentIntent?.paymentDueAt | date:'yyyy-MM-dd HH:mm' }}</p>
         <p *ngIf="isPaymentExpired()">El tiempo de pago vencio. Debes crear una nueva reserva.</p>
         <button class="btn btn--primary" type="button" (click)="payDeposit()" [disabled]="processingPayment || isPaymentExpired()">
-          {{ processingPayment ? 'Procesando pago...' : 'Pagar anticipo (simulado)' }}
+          {{ processingPayment ? 'Preparando pago...' : 'Ir al pago simulado' }}
         </button>
       </div>
 

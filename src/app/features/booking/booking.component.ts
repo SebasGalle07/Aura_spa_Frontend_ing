@@ -247,18 +247,26 @@ export class BookingComponent implements OnInit {
     if (!this.createdAppointment) {
       return;
     }
+    if (this.paymentIntent?.paymentReference) {
+      this.router.navigate(['/payments/checkout'], {
+        queryParams: { reference: this.paymentIntent.paymentReference, returnTo: '/appointments' },
+      });
+      return;
+    }
+
     this.processingPayment = true;
     this.appointmentsApi
-      .mockApprovePayment(this.createdAppointment.id)
+      .initPayment(this.createdAppointment.id)
       .pipe(finalize(() => (this.processingPayment = false)))
       .subscribe({
-        next: (updated) => {
-          this.createdAppointment = updated;
-          this.paymentIntent = undefined;
-          this.toast.show('Pago aprobado. Tu reserva quedo confirmada.', 'success');
+        next: (paymentIntent) => {
+          this.paymentIntent = paymentIntent;
+          this.router.navigate(['/payments/checkout'], {
+            queryParams: { reference: paymentIntent.paymentReference, returnTo: '/appointments' },
+          });
         },
         error: (err) => {
-          this.toast.show(err?.error?.detail || 'No fue posible procesar el pago.', 'error');
+          this.toast.show(err?.error?.detail || 'No fue posible iniciar el pago del anticipo.', 'error');
         },
       });
   }
