@@ -53,8 +53,16 @@
         </label>
         <label>
           Telefono
-          <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="phone" name="phone" />
-          <span class="hint">Opcional. Lo usamos para confirmaciones.</span>
+          <input
+            type="text"
+            digitsOnly
+            inputmode="numeric"
+            autocomplete="tel"
+            [(ngModel)]="phone"
+            name="phone"
+            (blur)="markTouched('phone')"
+          />
+          <span class="field-error" *ngIf="(submitted || touched.phone) && !phone">Campo obligatorio.</span>
         </label>
         <label>
           Contrasena

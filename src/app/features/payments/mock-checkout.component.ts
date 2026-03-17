@@ -15,6 +15,7 @@ import { ToastService } from '../../core/toast.service';
 })
 export class MockCheckoutComponent implements OnInit {
   @ViewChild('wompiForm') wompiForm?: ElementRef<HTMLFormElement>;
+  @ViewChild('payuForm') payuForm?: ElementRef<HTMLFormElement>;
   loading = true;
   processing = false;
   error = '';
@@ -22,8 +23,11 @@ export class MockCheckoutComponent implements OnInit {
   returnTo = '/appointments';
   stage = 'checkout';
   transactionId = '';
+  provider = '';
+  payuTransactionState = '';
   paymentIntent?: AppointmentPaymentInitResponse;
   latestAppointment?: Appointment;
+  private payuRefreshAttempts = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -37,6 +41,9 @@ export class MockCheckoutComponent implements OnInit {
       this.reference = (params.get('reference') || '').trim();
       this.stage = (params.get('stage') || 'checkout').trim().toLowerCase();
       this.transactionId = (params.get('id') || '').trim();
+      this.provider = (params.get('provider') || '').trim().toLowerCase();
+      this.payuTransactionState = (params.get('transactionState') || '').trim();
+      this.payuRefreshAttempts = 0;
       const requestedReturnTo = (params.get('returnTo') || '').trim();
       this.returnTo = requestedReturnTo.startsWith('/') ? requestedReturnTo : '/appointments';
       this.loadCheckout();
@@ -66,12 +73,20 @@ export class MockCheckoutComponent implements OnInit {
     return this.paymentIntent?.provider?.toLowerCase() === 'wompi';
   }
 
+  isPayU(): boolean {
+    return this.paymentIntent?.provider?.toLowerCase() === 'payu' || this.provider === 'payu';
+  }
+
   canContinueToGateway(): boolean {
     return !!this.paymentIntent && this.paymentIntent.status === 'pending' && !this.isExpired() && !this.processing;
   }
 
   continueToGateway(): void {
     if (!this.canContinueToGateway()) {
+      return;
+    }
+    if (this.isPayU()) {
+      this.payuForm?.nativeElement.submit();
       return;
     }
     if (this.isWompi()) {
@@ -119,6 +134,10 @@ export class MockCheckoutComponent implements OnInit {
       next: (paymentIntent) => {
         this.paymentIntent = paymentIntent;
         this.loading = false;
+        if (this.stage === 'result' && this.isPayU()) {
+          this.resolvePayuReturn();
+          this.refreshPayuStatus();
+        }
         if (this.stage === 'result' && this.isWompi()) {
           this.syncWompiResult();
         }
@@ -128,6 +147,44 @@ export class MockCheckoutComponent implements OnInit {
         this.error = err?.error?.detail || 'No fue posible cargar el checkout simulado.';
       },
     });
+  }
+
+  private resolvePayuReturn(): void {
+    const state = this.payuTransactionState;
+    if (state === '4') {
+      this.toast.show('PayU reporto el pago como aprobado. Estamos actualizando tu reserva.', 'success');
+    } else if (state === '6') {
+      this.toast.show('PayU reporto el pago como rechazado.', 'error');
+    } else if (state === '5') {
+      this.toast.show('PayU reporto el pago como expirado.', 'error');
+    } else if (state) {
+      this.toast.show(`PayU devolvio el estado ${state}.`, 'info');
+    }
+  }
+
+  private refreshPayuStatus(): void {
+    if (!this.isPayU() || !this.reference || !this.paymentIntent || this.paymentIntent.status !== 'pending') {
+      return;
+    }
+    if (this.payuRefreshAttempts >= 5) {
+      return;
+    }
+    this.payuRefreshAttempts += 1;
+    window.setTimeout(() => {
+      this.appointmentsApi.getPaymentCheckoutData(this.reference).subscribe({
+        next: (paymentIntent) => {
+          this.paymentIntent = paymentIntent;
+          if (paymentIntent.status === 'approved') {
+            this.toast.show('PayU confirmo el pago del anticipo y la reserva quedo actualizada.', 'success');
+            return;
+          }
+          if (paymentIntent.status === 'rejected' || paymentIntent.status === 'expired' || paymentIntent.status === 'cancelled') {
+            return;
+          }
+          this.refreshPayuStatus();
+        },
+      });
+    }, 2000);
   }
 
   private syncWompiResult(): void {

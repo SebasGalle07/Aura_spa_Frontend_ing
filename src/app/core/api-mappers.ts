@@ -151,10 +151,26 @@ export const mapAppointmentPaymentInitFromApi = (data: AnyRecord): AppointmentPa
   status: data.status,
   checkoutUrl: data.checkout_url ?? data.checkoutUrl ?? null,
   checkoutData: data.checkout_data || data.checkoutData
-    ? {
+      ? {
         provider: data.checkout_data?.provider ?? data.checkoutData?.provider,
         publicKey: data.checkout_data?.public_key ?? data.checkoutData?.publicKey ?? null,
         checkoutUrl: data.checkout_data?.checkout_url ?? data.checkoutData?.checkoutUrl ?? null,
+        merchantId: data.checkout_data?.merchant_id ?? data.checkoutData?.merchantId ?? null,
+        accountId: data.checkout_data?.account_id ?? data.checkoutData?.accountId ?? null,
+        referenceCode: data.checkout_data?.reference_code ?? data.checkoutData?.referenceCode ?? null,
+        description: data.checkout_data?.description ?? data.checkoutData?.description ?? null,
+        amount: data.checkout_data?.amount ?? data.checkoutData?.amount ?? null,
+        tax: data.checkout_data?.tax ?? data.checkoutData?.tax ?? null,
+        taxReturnBase: data.checkout_data?.tax_return_base ?? data.checkoutData?.taxReturnBase ?? null,
+        signature: data.checkout_data?.signature ?? data.checkoutData?.signature ?? null,
+        signatureAlgorithm:
+          data.checkout_data?.signature_algorithm ?? data.checkoutData?.signatureAlgorithm ?? null,
+        test: data.checkout_data?.test ?? data.checkoutData?.test ?? null,
+        buyerEmail: data.checkout_data?.buyer_email ?? data.checkoutData?.buyerEmail ?? null,
+        responseUrl: data.checkout_data?.response_url ?? data.checkoutData?.responseUrl ?? null,
+        confirmationUrl: data.checkout_data?.confirmation_url ?? data.checkoutData?.confirmationUrl ?? null,
+        payerFullName: data.checkout_data?.payer_full_name ?? data.checkoutData?.payerFullName ?? null,
+        mobilePhone: data.checkout_data?.mobile_phone ?? data.checkoutData?.mobilePhone ?? null,
         amountInCents: Number(data.checkout_data?.amount_in_cents ?? data.checkoutData?.amountInCents ?? 0),
         currency: data.checkout_data?.currency ?? data.checkoutData?.currency ?? null,
         reference: data.checkout_data?.reference ?? data.checkoutData?.reference ?? null,

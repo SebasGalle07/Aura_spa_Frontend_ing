@@ -4,9 +4,10 @@
       <a class="btn btn--secondary" [routerLink]="returnTo">Volver</a>
     </div>
 
-    <h1>{{ isWompi() ? 'Pago de anticipo' : 'Pago simulado' }}</h1>
-    <p class="lead" *ngIf="!isWompi()">Este entorno academico simula la confirmacion del anticipo para validar el flujo completo de reservas.</p>
+    <h1>{{ isWompi() || isPayU() ? 'Pago de anticipo' : 'Pago simulado' }}</h1>
+    <p class="lead" *ngIf="!isWompi() && !isPayU()">Este entorno academico simula la confirmacion del anticipo para validar el flujo completo de reservas.</p>
     <p class="lead" *ngIf="isWompi()">Seras redirigido a Wompi en modo de prueba para completar el pago del anticipo con datos sandbox.</p>
+    <p class="lead" *ngIf="isPayU()">Seras redirigido a PayU Sandbox para completar el pago del anticipo con datos de prueba.</p>
 
     <div class="card checkout" *ngIf="loading">
       <p>Cargando datos del pago...</p>
@@ -38,13 +39,44 @@
       <p class="checkout__hint" *ngIf="isWompi() && stage !== 'result' && payment.status === 'pending' && !isExpired()">
         Al continuar se abrira el checkout sandbox de Wompi. La reserva se confirmara solo si Wompi reporta el pago como aprobado.
       </p>
-      <p class="checkout__hint" *ngIf="!isWompi() && payment.status === 'pending' && !isExpired()">Selecciona el resultado que deseas simular para esta transaccion.</p>
+      <p class="checkout__hint" *ngIf="isPayU() && stage !== 'result' && payment.status === 'pending' && !isExpired()">
+        Al continuar se abrira PayU Sandbox. La reserva se confirmara solo cuando PayU notifique el pago aprobado a tu backend.
+      </p>
+      <p class="checkout__hint" *ngIf="!isWompi() && !isPayU() && payment.status === 'pending' && !isExpired()">Selecciona el resultado que deseas simular para esta transaccion.</p>
       <p class="checkout__hint checkout__hint--error" *ngIf="payment.status === 'pending' && isExpired()">
         El tiempo de retencion ya vencio. Puedes simular la expiracion para cerrar el intento.
       </p>
       <p class="checkout__hint" *ngIf="isWompi() && stage === 'result' && !error">
         Estamos validando con Wompi el resultado de la transaccion.
       </p>
+      <p class="checkout__hint" *ngIf="isPayU() && stage === 'result' && !error">
+        PayU ya te devolvio al sistema. La confirmacion final de la reserva depende de la notificacion enviada al backend.
+      </p>
+
+      <form
+        #payuForm
+        *ngIf="isPayU() && payment.checkoutData && stage !== 'result'"
+        [attr.action]="payment.checkoutData.checkoutUrl || payment.checkoutUrl"
+        method="POST"
+        class="checkout__wompi"
+      >
+        <input type="hidden" name="merchantId" [value]="payment.checkoutData.merchantId || ''" />
+        <input type="hidden" name="accountId" [value]="payment.checkoutData.accountId || ''" />
+        <input type="hidden" name="description" [value]="payment.checkoutData.description || ''" />
+        <input type="hidden" name="referenceCode" [value]="payment.checkoutData.referenceCode || payment.paymentReference" />
+        <input type="hidden" name="amount" [value]="payment.checkoutData.amount || payment.amount" />
+        <input type="hidden" name="tax" [value]="payment.checkoutData.tax || '0'" />
+        <input type="hidden" name="taxReturnBase" [value]="payment.checkoutData.taxReturnBase || '0'" />
+        <input type="hidden" name="currency" [value]="payment.checkoutData.currency || payment.currency" />
+        <input type="hidden" name="signature" [value]="payment.checkoutData.signature || ''" />
+        <input type="hidden" name="test" [value]="payment.checkoutData.test || '1'" />
+        <input type="hidden" name="buyerEmail" [value]="payment.checkoutData.buyerEmail || ''" />
+        <input type="hidden" name="responseUrl" [value]="payment.checkoutData.responseUrl || ''" />
+        <input type="hidden" name="confirmationUrl" [value]="payment.checkoutData.confirmationUrl || ''" />
+        <input type="hidden" name="payerFullName" [value]="payment.checkoutData.payerFullName || ''" />
+        <input type="hidden" name="mobilePhone" [value]="payment.checkoutData.mobilePhone || ''" />
+        <input type="hidden" name="algorithmSignature" [value]="payment.checkoutData.signatureAlgorithm || 'MD5'" />
+      </form>
 
       <form
         #wompiForm
@@ -65,7 +97,7 @@
         <input type="hidden" name="customer-data:phone-number" [value]="payment.checkoutData.customerPhoneNumber || ''" />
       </form>
 
-      <div class="checkout__actions" *ngIf="!isWompi()">
+      <div class="checkout__actions" *ngIf="!isWompi() && !isPayU()">
         <button class="btn btn--primary" type="button" (click)="process('approved')" [disabled]="!canSimulatePayment()">
           {{ processing ? 'Procesando...' : 'Aprobar pago' }}
         </button>
@@ -77,9 +109,9 @@
         </button>
       </div>
 
-      <div class="checkout__actions" *ngIf="isWompi() && stage !== 'result'">
+      <div class="checkout__actions" *ngIf="(isWompi() || isPayU()) && stage !== 'result'">
         <button class="btn btn--primary" type="button" (click)="continueToGateway()" [disabled]="!canContinueToGateway()">
-          {{ processing ? 'Redirigiendo...' : 'Continuar con Wompi' }}
+          {{ processing ? 'Redirigiendo...' : (isPayU() ? 'Continuar con PayU Sandbox' : 'Continuar con Wompi') }}
         </button>
       </div>
     </div>

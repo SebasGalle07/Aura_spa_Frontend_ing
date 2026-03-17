@@ -12,17 +12,6 @@ import { ToastService } from '../../core/toast.service';
 import { Appointment, AppointmentPaymentInitResponse, Professional, Service } from '../../core/models';
 import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
 
-type BookingDraft = {
-  serviceId: number | null;
-  professionalId: number | null;
-  date: string;
-  selectedTime: string;
-  notes: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-};
-
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -55,8 +44,6 @@ export class BookingComponent implements OnInit {
   clientPhone = '';
 
   private readonly draftKey = 'aura_spa_booking_draft_v1';
-  private restoreProfessionalId: number | null = null;
-  private restoreTime = '';
 
   constructor(
     private servicesApi: ServicesService,
@@ -70,24 +57,14 @@ export class BookingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const draft = this.readDraft();
-    if (draft) {
-      this.date = draft.date >= this.minDate ? draft.date : this.minDate;
-      this.notes = draft.notes || '';
-      this.clientName = draft.clientName || '';
-      this.clientEmail = draft.clientEmail || '';
-      this.clientPhone = draft.clientPhone || '';
-      this.requestedServiceId = draft.serviceId;
-      this.restoreProfessionalId = draft.professionalId;
-      this.restoreTime = draft.selectedTime || '';
-    }
+    this.clearLegacyDraft();
+    this.resetBookingState();
 
     const user = this.auth.currentUser;
     if (user) {
-      if (!this.clientName) this.clientName = user.name || '';
-      if (!this.clientEmail) this.clientEmail = user.email || '';
-      if (!this.clientPhone) this.clientPhone = user.phone || '';
-      this.persistDraft();
+      this.clientName = user.name || '';
+      this.clientEmail = user.email || '';
+      this.clientPhone = user.phone || '';
     }
 
     this.route.queryParamMap.subscribe((params) => {
@@ -95,8 +72,8 @@ export class BookingComponent implements OnInit {
       const parsed = raw ? Number(raw) : NaN;
       if (Number.isFinite(parsed) && parsed > 0) {
         this.requestedServiceId = parsed;
-        this.restoreProfessionalId = null;
-        this.restoreTime = '';
+      } else {
+        this.requestedServiceId = null;
       }
       this.tryPreselectService();
     });
@@ -116,27 +93,27 @@ export class BookingComponent implements OnInit {
       });
   }
 
-  selectService(service: Service, options: { restoring?: boolean; skipScroll?: boolean } = {}): void {
+  selectService(service: Service, options: { skipScroll?: boolean } = {}): void {
     this.selectedService = service;
     this.detailService = undefined;
     this.selectedProfessional = undefined;
     this.selectedTime = '';
     this.slots = [];
     this.createdAppointment = undefined;
-    this.loadProfessionalsForService(service.id, !!options.restoring);
-    this.persistDraft();
+    this.paymentIntent = undefined;
+    this.loadProfessionalsForService(service.id);
     if (!options.skipScroll) {
       this.scrollToStep('step-professional');
     }
   }
 
-  selectProfessional(pro: Professional, options: { restoring?: boolean; skipScroll?: boolean } = {}): void {
+  selectProfessional(pro: Professional, options: { skipScroll?: boolean } = {}): void {
     this.selectedProfessional = pro;
     this.selectedTime = '';
     this.slots = [];
     this.createdAppointment = undefined;
-    this.loadSlots(!!options.restoring);
-    this.persistDraft();
+    this.paymentIntent = undefined;
+    this.loadSlots();
     if (!options.skipScroll) {
       this.scrollToStep('step-schedule');
     }
@@ -146,12 +123,11 @@ export class BookingComponent implements OnInit {
     this.selectedTime = '';
     this.slots = [];
     if (this.selectedService && this.selectedProfessional) {
-      this.loadSlots(false);
+      this.loadSlots();
     }
-    this.persistDraft();
   }
 
-  loadSlots(restoring = false): void {
+  loadSlots(): void {
     if (!this.selectedService || !this.selectedProfessional || !this.date) {
       return;
     }
@@ -162,11 +138,6 @@ export class BookingComponent implements OnInit {
       .subscribe({
         next: (slots) => {
           this.slots = slots;
-          if (restoring && this.restoreTime && slots.includes(this.restoreTime)) {
-            this.selectedTime = this.restoreTime;
-            this.restoreTime = '';
-          }
-          this.persistDraft();
         },
         error: () => {
           this.slots = [];
@@ -201,7 +172,6 @@ export class BookingComponent implements OnInit {
           this.selectedTime = '';
           this.notes = '';
           this.slots = this.slots.filter((slot) => slot !== apt.time);
-          this.persistDraft();
         },
         error: (err) => {
           const msg = err?.error?.detail || 'No fue posible crear la cita.';
@@ -233,14 +203,17 @@ export class BookingComponent implements OnInit {
 
   selectTime(slot: string): void {
     this.selectedTime = slot;
-    this.persistDraft();
     this.scrollToStep('step-confirmation');
   }
 
   startNewBooking(): void {
-    this.createdAppointment = undefined;
-    this.paymentIntent = undefined;
-    this.persistDraft();
+    this.resetBookingState();
+    const user = this.auth.currentUser;
+    if (user) {
+      this.clientName = user.name || '';
+      this.clientEmail = user.email || '';
+      this.clientPhone = user.phone || '';
+    }
   }
 
   payDeposit(): void {
@@ -300,7 +273,7 @@ export class BookingComponent implements OnInit {
   }
 
   onClientDataChanged(): void {
-    this.persistDraft();
+    return;
   }
 
   describe(service: Service): string {
@@ -319,7 +292,7 @@ export class BookingComponent implements OnInit {
     );
   }
 
-  private loadProfessionalsForService(serviceId: number, restoring: boolean): void {
+  private loadProfessionalsForService(serviceId: number): void {
     this.loadingProfessionals = true;
     this.professionalsApi
       .list(false, serviceId)
@@ -327,46 +300,12 @@ export class BookingComponent implements OnInit {
       .subscribe({
         next: (items) => {
           this.professionals = items.filter((item) => item.active);
-          if (restoring && this.restoreProfessionalId) {
-            const match = this.professionals.find((item) => item.id === this.restoreProfessionalId);
-            if (match) {
-              this.selectProfessional(match, { restoring: true, skipScroll: true });
-            }
-          }
-          this.persistDraft();
         },
         error: () => {
           this.professionals = [];
           this.toast.show('No fue posible cargar profesionales para este servicio.', 'error');
         },
       });
-  }
-
-  private readDraft(): BookingDraft | null {
-    try {
-      const raw = sessionStorage.getItem(this.draftKey);
-      if (!raw) {
-        return null;
-      }
-      const parsed = JSON.parse(raw) as BookingDraft;
-      return parsed;
-    } catch {
-      return null;
-    }
-  }
-
-  private persistDraft(): void {
-    const draft: BookingDraft = {
-      serviceId: this.selectedService?.id ?? this.requestedServiceId ?? null,
-      professionalId: this.selectedProfessional?.id ?? this.restoreProfessionalId ?? null,
-      date: this.date,
-      selectedTime: this.selectedTime || this.restoreTime || '',
-      notes: this.notes,
-      clientName: this.clientName,
-      clientEmail: this.clientEmail,
-      clientPhone: this.clientPhone,
-    };
-    sessionStorage.setItem(this.draftKey, JSON.stringify(draft));
   }
 
   private todayStr(): string {
@@ -383,10 +322,25 @@ export class BookingComponent implements OnInit {
     }
     const requested = this.services.find((service) => service.id === this.requestedServiceId);
     if (requested) {
-      const restoring = !!this.restoreProfessionalId || !!this.restoreTime;
-      this.selectService(requested, { restoring, skipScroll: restoring });
+      this.selectService(requested, { skipScroll: false });
       this.requestedServiceId = null;
     }
+  }
+
+  private resetBookingState(): void {
+    this.selectedService = undefined;
+    this.detailService = undefined;
+    this.selectedProfessional = undefined;
+    this.date = this.minDate;
+    this.slots = [];
+    this.selectedTime = '';
+    this.notes = '';
+    this.createdAppointment = undefined;
+    this.paymentIntent = undefined;
+  }
+
+  private clearLegacyDraft(): void {
+    sessionStorage.removeItem(this.draftKey);
   }
 
   private scrollToStep(stepId: string): void {

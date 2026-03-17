@@ -66,6 +66,7 @@ export class RegisterComponent implements AfterViewInit {
   touched = {
     name: false,
     email: false,
+    phone: false,
     password: false,
     confirmPassword: false,
     terms: false,
@@ -95,7 +96,7 @@ export class RegisterComponent implements AfterViewInit {
 
     this.loading = true;
     this.auth
-      .register({ name: this.name.trim(), email: this.email.trim(), phone: this.phone || undefined, password: this.password })
+      .register({ name: this.name.trim(), email: this.email.trim(), phone: this.phone.trim(), password: this.password })
       .subscribe({
         next: () => {
           this.loading = false;
@@ -162,6 +163,7 @@ export class RegisterComponent implements AfterViewInit {
       !!this.name &&
       this.nameValid &&
       this.emailValid &&
+      !!this.phone.trim() &&
       this.passwordMinOk &&
       this.passwordMaxOk &&
       this.passwordUppercaseOk &&

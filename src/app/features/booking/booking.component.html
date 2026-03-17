@@ -100,14 +100,16 @@
           <p>Fecha: {{ date }} - {{ selectedTime }}</p>
         </div>
         <div class="summary__form">
-          <label>
-            Nombre
-            <input type="text" [(ngModel)]="clientName" (ngModelChange)="onClientDataChanged()" />
-          </label>
-          <label>
-            Correo
-            <input type="email" [(ngModel)]="clientEmail" (ngModelChange)="onClientDataChanged()" />
-          </label>
+          <div class="summary__readonly">
+            <span class="summary__readonly-label">Nombre</span>
+            <strong>{{ clientName }}</strong>
+            <small>Se toma automaticamente de tu cuenta.</small>
+          </div>
+          <div class="summary__readonly">
+            <span class="summary__readonly-label">Correo de confirmacion</span>
+            <strong>{{ clientEmail }}</strong>
+            <small>Se enviara automaticamente al correo de tu sesion.</small>
+          </div>
           <label>
             Telefono
             <input

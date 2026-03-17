@@ -140,6 +140,24 @@ h1 {
   font-size: 12px;
 }
 
+.summary__readonly {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--sand);
+  border-radius: 10px;
+  background: #fbf7f2;
+}
+
+.summary__readonly-label {
+  font-size: 12px;
+  color: #6c5b50;
+}
+
+.summary__readonly small {
+  color: #6c5b50;
+}
+
 .summary__form input,
 .summary__form textarea {
   padding: 8px 12px;

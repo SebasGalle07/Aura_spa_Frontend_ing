@@ -33,6 +33,7 @@ type ForgotPasswordResponse = {
 export class AuthService {
   private readonly tokenKey = 'aura_token';
   private readonly refreshTokenKey = 'aura_refresh_token';
+  private readonly transientSessionKeys = ['aura_spa_booking_draft_v1'];
   private userSubject = new BehaviorSubject<User | null>(null);
   private refreshInFlight$?: Observable<string>;
   user$ = this.userSubject.asObservable();
@@ -185,6 +186,7 @@ export class AuthService {
   }
 
   private setSession(token: string, user: User, refreshToken?: string | null): void {
+    this.clearTransientSessionState();
     if (token) {
       localStorage.setItem(this.tokenKey, token);
     }
@@ -197,6 +199,13 @@ export class AuthService {
   private clearSession(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
+    this.clearTransientSessionState();
     this.userSubject.next(null);
+  }
+
+  private clearTransientSessionState(): void {
+    for (const key of this.transientSessionKeys) {
+      sessionStorage.removeItem(key);
+    }
   }
 }
