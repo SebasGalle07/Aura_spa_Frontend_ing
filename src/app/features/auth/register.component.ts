@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+﻿import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
@@ -51,7 +51,7 @@ declare global {
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
-export class RegisterComponent implements AfterViewInit {
+export class RegisterComponent implements OnInit, AfterViewInit {
   @ViewChild('googleButtonHost') private googleButtonHost?: ElementRef<HTMLDivElement>;
 
   name = '';
@@ -77,8 +77,13 @@ export class RegisterComponent implements AfterViewInit {
   googleReady = false;
   readonly googleEnabled = !!environment.googleClientId?.trim();
   private readonly googleScriptId = 'google-gsi-script';
+  private readonly draftKey = 'aura_spa_register_draft_v1';
 
   constructor(private auth: AuthService, private router: Router, private toast: ToastService) {}
+
+  ngOnInit(): void {
+    this.restoreDraft();
+  }
 
   ngAfterViewInit(): void {
     if (this.googleEnabled) {
@@ -100,6 +105,7 @@ export class RegisterComponent implements AfterViewInit {
       .subscribe({
         next: () => {
           this.loading = false;
+          this.clearDraft();
           this.toast.show('Cuenta creada. Revisa tu correo para activarla.', 'success');
           this.router.navigate(['/login']);
         },
@@ -119,6 +125,11 @@ export class RegisterComponent implements AfterViewInit {
       .replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ'\-\s]/g, '')
       .replace(/\s{2,}/g, ' ')
       .trimStart();
+    this.persistDraft();
+  }
+
+  onDraftChanged(): void {
+    this.persistDraft();
   }
 
   get nameValid(): boolean {
@@ -128,6 +139,10 @@ export class RegisterComponent implements AfterViewInit {
 
   get emailValid(): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
+  }
+
+  get phoneValid(): boolean {
+    return /^\d{10}$/.test(this.phone.trim());
   }
 
   get passwordMinOk(): boolean {
@@ -163,7 +178,7 @@ export class RegisterComponent implements AfterViewInit {
       !!this.name &&
       this.nameValid &&
       this.emailValid &&
-      !!this.phone.trim() &&
+      this.phoneValid &&
       this.passwordMinOk &&
       this.passwordMaxOk &&
       this.passwordUppercaseOk &&
@@ -249,6 +264,7 @@ export class RegisterComponent implements AfterViewInit {
     this.auth.loginWithGoogle(credential).subscribe({
       next: () => {
         this.googleLoading = false;
+        this.clearDraft();
         this.toast.show('Cuenta iniciada con Google.', 'success');
         this.router.navigate(['/book']);
       },
@@ -257,5 +273,49 @@ export class RegisterComponent implements AfterViewInit {
         this.error = err?.error?.detail || 'No fue posible iniciar sesion con Google.';
       },
     });
+  }
+
+  private persistDraft(): void {
+    sessionStorage.setItem(
+      this.draftKey,
+      JSON.stringify({
+        name: this.name,
+        email: this.email,
+        phone: this.phone,
+        password: this.password,
+        confirmPassword: this.confirmPassword,
+        acceptTerms: this.acceptTerms,
+      }),
+    );
+  }
+
+  private restoreDraft(): void {
+    const raw = sessionStorage.getItem(this.draftKey);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const draft = JSON.parse(raw) as {
+        name?: string;
+        email?: string;
+        phone?: string;
+        password?: string;
+        confirmPassword?: string;
+        acceptTerms?: boolean;
+      };
+      this.name = draft.name || '';
+      this.email = draft.email || '';
+      this.phone = draft.phone || '';
+      this.password = draft.password || '';
+      this.confirmPassword = draft.confirmPassword || '';
+      this.acceptTerms = !!draft.acceptTerms;
+    } catch {
+      this.clearDraft();
+    }
+  }
+
+  private clearDraft(): void {
+    sessionStorage.removeItem(this.draftKey);
   }
 }

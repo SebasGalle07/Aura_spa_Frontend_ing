@@ -44,6 +44,7 @@ export class BookingComponent implements OnInit {
   clientPhone = '';
 
   private readonly draftKey = 'aura_spa_booking_draft_v1';
+  private readonly colombianPhoneRegex = /^\d{10}$/;
 
   constructor(
     private servicesApi: ServicesService,
@@ -65,6 +66,9 @@ export class BookingComponent implements OnInit {
       this.clientName = user.name || '';
       this.clientEmail = user.email || '';
       this.clientPhone = user.phone || '';
+      if (user.role === 'client' && !this.hasValidColombianPhone(this.clientPhone)) {
+        this.toast.show('Debes actualizar un telefono colombiano valido de 10 digitos en tu perfil antes de reservar.', 'info');
+      }
     }
 
     this.route.queryParamMap.subscribe((params) => {
@@ -149,6 +153,10 @@ export class BookingComponent implements OnInit {
   confirmBooking(): void {
     if (!this.selectedService || !this.selectedProfessional || !this.date || !this.selectedTime) {
       this.toast.show('Selecciona servicio, profesional, fecha y hora.', 'error');
+      return;
+    }
+    if (!this.hasValidColombianPhone(this.clientPhone)) {
+      this.toast.show('Ingresa un telefono colombiano valido de 10 digitos para continuar.', 'error');
       return;
     }
     this.creating = true;
@@ -276,6 +284,10 @@ export class BookingComponent implements OnInit {
     return;
   }
 
+  get clientPhoneValid(): boolean {
+    return this.hasValidColombianPhone(this.clientPhone);
+  }
+
   describe(service: Service): string {
     const byCategory: Record<string, string> = {
       masajes: 'Terapia orientada a liberar tension muscular y reducir el estres.',
@@ -362,5 +374,9 @@ export class BookingComponent implements OnInit {
         this.toast.show(err?.error?.detail || 'No fue posible iniciar el pago del anticipo.', 'error');
       },
     });
+  }
+
+  private hasValidColombianPhone(phone?: string | null): boolean {
+    return this.colombianPhoneRegex.test((phone || '').trim());
   }
 }

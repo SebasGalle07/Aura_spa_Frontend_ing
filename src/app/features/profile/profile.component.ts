@@ -27,7 +27,10 @@ export class ProfileComponent implements OnInit {
   confirmPassword = '';
 
   totalAppointments = 0;
+  pendingPaymentAppointments = 0;
+  cancelledAppointments = 0;
   completedAppointments = 0;
+  private readonly colombianPhoneRegex = /^\d{10}$/;
 
   saving = false;
   changing = false;
@@ -49,12 +52,18 @@ export class ProfileComponent implements OnInit {
 
     this.appointmentsApi.listMine().subscribe((appointments) => {
       this.totalAppointments = appointments.length;
+      this.pendingPaymentAppointments = appointments.filter((apt) => apt.status === 'pending_payment').length;
+      this.cancelledAppointments = appointments.filter((apt) => apt.status === 'cancelled').length;
       this.completedAppointments = appointments.filter((apt) => apt.status === 'completed').length;
     });
   }
 
   saveProfile(): void {
     if (!this.user) {
+      return;
+    }
+    if (this.user.role === 'client' && !this.phoneValid) {
+      this.toast.show('Ingresa un telefono colombiano valido de 10 digitos.', 'error');
       return;
     }
     this.saving = true;
@@ -80,6 +89,10 @@ export class ProfileComponent implements OnInit {
   changePassword(): void {
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
       this.toast.show('Completa todos los campos.', 'error');
+      return;
+    }
+    if (!this.newPasswordSecurityValid) {
+      this.toast.show('La nueva contrasena debe tener minimo 8 caracteres, mayuscula, minuscula, numero y caracter especial.', 'error');
       return;
     }
     if (this.newPassword !== this.confirmPassword) {
@@ -111,6 +124,45 @@ export class ProfileComponent implements OnInit {
       professional: 'Profesional',
     };
     return role ? labels[role] || role : '';
+  }
+
+  get phoneValid(): boolean {
+    return this.colombianPhoneRegex.test((this.phone || '').trim());
+  }
+
+  get newPasswordMinOk(): boolean {
+    return this.newPassword.length >= 8;
+  }
+
+  get newPasswordMaxOk(): boolean {
+    return new TextEncoder().encode(this.newPassword).length <= 72;
+  }
+
+  get newPasswordUppercaseOk(): boolean {
+    return /[A-Z]/.test(this.newPassword);
+  }
+
+  get newPasswordLowercaseOk(): boolean {
+    return /[a-z]/.test(this.newPassword);
+  }
+
+  get newPasswordDigitOk(): boolean {
+    return /\d/.test(this.newPassword);
+  }
+
+  get newPasswordSpecialOk(): boolean {
+    return /[^A-Za-z0-9]/.test(this.newPassword);
+  }
+
+  get newPasswordSecurityValid(): boolean {
+    return (
+      this.newPasswordMinOk &&
+      this.newPasswordMaxOk &&
+      this.newPasswordUppercaseOk &&
+      this.newPasswordLowercaseOk &&
+      this.newPasswordDigitOk &&
+      this.newPasswordSpecialOk
+    );
   }
 }
 

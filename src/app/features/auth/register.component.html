@@ -1,4 +1,4 @@
-<section class="auth">
+﻿<section class="auth">
   <div class="container auth__grid">
     <aside class="auth__panel">
       <p class="eyebrow">Aura Spa</p>
@@ -38,6 +38,7 @@
             [(ngModel)]="name"
             name="name"
             (input)="onNameInput()"
+            (ngModelChange)="onDraftChanged()"
             (blur)="markTouched('name')"
           />
           <span class="field-error" *ngIf="(submitted || touched.name) && !name">Campo obligatorio.</span>
@@ -47,7 +48,7 @@
         </label>
         <label>
           Correo
-          <input type="email" [(ngModel)]="email" name="email" (blur)="markTouched('email')" />
+          <input type="email" [(ngModel)]="email" name="email" (ngModelChange)="onDraftChanged()" (blur)="markTouched('email')" />
           <span class="field-error" *ngIf="(submitted || touched.email) && !email">Campo obligatorio.</span>
           <span class="field-error" *ngIf="(submitted || touched.email) && email && !emailValid">Correo invalido.</span>
         </label>
@@ -60,9 +61,14 @@
             autocomplete="tel"
             [(ngModel)]="phone"
             name="phone"
+            maxlength="10"
+            (ngModelChange)="onDraftChanged()"
             (blur)="markTouched('phone')"
           />
           <span class="field-error" *ngIf="(submitted || touched.phone) && !phone">Campo obligatorio.</span>
+          <span class="field-error" *ngIf="(submitted || touched.phone) && phone && !phoneValid">
+            Ingresa un telefono colombiano valido de 10 digitos.
+          </span>
         </label>
         <label>
           Contrasena
@@ -71,6 +77,7 @@
               [type]="showPassword ? 'text' : 'password'"
               [(ngModel)]="password"
               name="password"
+              (ngModelChange)="onDraftChanged()"
               (blur)="markTouched('password')"
             />
             <button type="button" class="toggle" (click)="showPassword = !showPassword">
@@ -106,6 +113,7 @@
               [type]="showConfirm ? 'text' : 'password'"
               [(ngModel)]="confirmPassword"
               name="confirmPassword"
+              (ngModelChange)="onDraftChanged()"
               (blur)="markTouched('confirmPassword')"
             />
             <button type="button" class="toggle" (click)="showConfirm = !showConfirm">
@@ -121,12 +129,18 @@
         </label>
 
         <label class="checkbox">
-          <input type="checkbox" [(ngModel)]="acceptTerms" name="terms" (blur)="markTouched('terms')" />
+          <input type="checkbox" [(ngModel)]="acceptTerms" name="terms" (ngModelChange)="onDraftChanged()" (blur)="markTouched('terms')" />
           <span>
             He le&iacute;do y acepto la
-            <a routerLink="/politica-datos">Pol&iacute;tica de Tratamiento de Datos Personales</a>.
+            <a routerLink="/politica-datos">Pol&iacute;tica de Tratamiento de Datos Personales</a>
+            y los
+            <a routerLink="/terminos-condiciones">T&eacute;rminos y Condiciones</a>.
           </span>
         </label>
+        <p class="auth__helper">
+          Consulta tambi&eacute;n la
+          <a routerLink="/politica-cancelacion">Pol&iacute;tica de Cancelaci&oacute;n y Reprogramaci&oacute;n</a>.
+        </p>
         <span class="field-error" *ngIf="(submitted || touched.terms) && !acceptTerms">Debes aceptar para continuar.</span>
 
         <p class="auth__error" *ngIf="error">{{ error }}</p>

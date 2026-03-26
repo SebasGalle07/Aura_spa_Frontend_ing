@@ -96,10 +96,15 @@ h1 {
   font-size: 13px;
 }
 
+.schedule__date {
+  width: min(260px, 100%);
+}
+
 .schedule input {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--taupe);
+  width: 100%;
 }
 
 .slots {

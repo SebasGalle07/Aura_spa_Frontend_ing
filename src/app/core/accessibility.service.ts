@@ -37,10 +37,35 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
 
 @Injectable({ providedIn: 'root' })
 export class AccessibilityService {
+  private static readonly TEXT_SELECTOR = [
+    '.a11y-root h1',
+    '.a11y-root h2',
+    '.a11y-root h3',
+    '.a11y-root h4',
+    '.a11y-root h5',
+    '.a11y-root h6',
+    '.a11y-root p',
+    '.a11y-root span',
+    '.a11y-root li',
+    '.a11y-root a',
+    '.a11y-root button',
+    '.a11y-root label',
+    '.a11y-root input',
+    '.a11y-root textarea',
+    '.a11y-root select',
+    '.a11y-root small',
+    '.a11y-root strong',
+    '.a11y-root legend',
+    '.a11y-root td',
+    '.a11y-root th',
+    '.toast-stack .toast',
+  ].join(', ');
+
   private settingsSubject = new BehaviorSubject<AccessibilitySettings>(DEFAULT_SETTINGS);
   settings$ = this.settingsSubject.asObservable();
   private readingSubject = new BehaviorSubject<boolean>(false);
   reading$ = this.readingSubject.asObservable();
+  private mutationObserver?: MutationObserver;
   readonly speechSupported =
     typeof window !== 'undefined' &&
     typeof window.speechSynthesis !== 'undefined' &&
@@ -49,6 +74,7 @@ export class AccessibilityService {
 
   constructor() {
     this.load();
+    this.watchDomChanges();
   }
 
   get current(): AccessibilitySettings {
@@ -225,6 +251,7 @@ export class AccessibilityService {
     root.style.setProperty('--a11y-letter-spacing', `${settings.letterSpacing}px`);
     root.style.setProperty('--a11y-content-scale', String(settings.contentScale));
     root.style.setProperty('--a11y-color-filter', this.buildFilter(settings));
+    this.applyTextScaling(settings.fontScale);
   }
 
   private buildFilter(settings: AccessibilitySettings): string {
@@ -256,5 +283,49 @@ export class AccessibilityService {
     } else {
       target.classList.remove(className);
     }
+  }
+
+  private watchDomChanges(): void {
+    if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') {
+      return;
+    }
+
+    this.mutationObserver = new MutationObserver(() => {
+      this.applyTextScaling(this.current.fontScale);
+    });
+
+    this.mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  private applyTextScaling(fontScale: number): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const elements = document.querySelectorAll<HTMLElement>(AccessibilityService.TEXT_SELECTOR);
+    elements.forEach((element) => {
+      if (!element.dataset['a11yBaseFontSize']) {
+        const computedFontSize = Number.parseFloat(window.getComputedStyle(element).fontSize);
+        if (!Number.isFinite(computedFontSize) || computedFontSize <= 0) {
+          return;
+        }
+        element.dataset['a11yBaseFontSize'] = String(computedFontSize);
+      }
+
+      const baseFontSize = Number.parseFloat(element.dataset['a11yBaseFontSize'] || '');
+      if (!Number.isFinite(baseFontSize) || baseFontSize <= 0) {
+        return;
+      }
+
+      if (fontScale === 1) {
+        element.style.removeProperty('font-size');
+        return;
+      }
+
+      element.style.fontSize = `${Number((baseFontSize * fontScale).toFixed(2))}px`;
+    });
   }
 }

@@ -67,6 +67,7 @@ export class LoginComponent implements AfterViewInit {
   googleReady = false;
   readonly googleEnabled = !!environment.googleClientId?.trim();
   private readonly googleScriptId = 'google-gsi-script';
+  private readonly colombianPhoneRegex = /^\d{10}$/;
 
   constructor(private auth: AuthService, private router: Router, private toast: ToastService) {}
 
@@ -86,10 +87,9 @@ export class LoginComponent implements AfterViewInit {
     }
     this.loading = true;
     this.auth.login(this.email, this.password).subscribe({
-      next: () => {
+      next: (user) => {
         this.loading = false;
-        this.toast.show('Bienvenido a Aura Spa.', 'success');
-        this.router.navigate(['/book']);
+        this.handleSuccessfulLogin(user);
       },
       error: (err) => {
         this.loading = false;
@@ -201,15 +201,37 @@ export class LoginComponent implements AfterViewInit {
     this.error = '';
     this.googleLoading = true;
     this.auth.loginWithGoogle(credential).subscribe({
-      next: () => {
+      next: (user) => {
         this.googleLoading = false;
-        this.toast.show('Bienvenido a Aura Spa.', 'success');
-        this.router.navigate(['/book']);
+        this.handleSuccessfulLogin(user);
       },
       error: (err) => {
         this.googleLoading = false;
         this.error = err?.error?.detail || 'No fue posible iniciar sesion con Google.';
       },
     });
+  }
+
+  private handleSuccessfulLogin(user: { role: string; phone?: string | null }): void {
+    if (user.role === 'client' && !this.hasValidColombianPhone(user.phone)) {
+      this.toast.show('Actualiza tu telefono de 10 digitos en tu perfil antes de reservar.', 'info');
+      this.router.navigate(['/profile']);
+      return;
+    }
+
+    this.toast.show('Bienvenido a Aura Spa.', 'success');
+    if (user.role === 'admin') {
+      this.router.navigate(['/admin']);
+      return;
+    }
+    if (user.role === 'client') {
+      this.router.navigate(['/book']);
+      return;
+    }
+    this.router.navigate(['/profile']);
+  }
+
+  private hasValidColombianPhone(phone?: string | null): boolean {
+    return this.colombianPhoneRegex.test((phone || '').trim());
   }
 }

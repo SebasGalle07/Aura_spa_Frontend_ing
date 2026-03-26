@@ -33,7 +33,7 @@ type ForgotPasswordResponse = {
 export class AuthService {
   private readonly tokenKey = 'aura_token';
   private readonly refreshTokenKey = 'aura_refresh_token';
-  private readonly transientSessionKeys = ['aura_spa_booking_draft_v1'];
+  private readonly transientSessionKeys = ['aura_spa_booking_draft_v1', 'aura_spa_register_draft_v1'];
   private userSubject = new BehaviorSubject<User | null>(null);
   private refreshInFlight$?: Observable<string>;
   user$ = this.userSubject.asObservable();

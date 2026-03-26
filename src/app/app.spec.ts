@@ -54,4 +54,13 @@ describe('App', () => {
     expect(compiled.querySelector('main#main-content')).toBeTruthy();
     expect(compiled.querySelector('app-navbar')).toBeTruthy();
   });
+
+  it('should configure longer durations for screen notifications', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance as unknown as { toastDurations: Record<string, number> };
+
+    expect(app.toastDurations['success']).toBe(4500);
+    expect(app.toastDurations['info']).toBe(6000);
+    expect(app.toastDurations['error']).toBe(7000);
+  });
 });

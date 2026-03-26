@@ -19,6 +19,11 @@ import { Toast, ToastService } from './core/toast.service';
 })
 export class App implements OnInit, OnDestroy {
   private readonly defaultFavicon = 'favicon.ico';
+  private readonly toastDurations: Record<Toast['type'], number> = {
+    success: 4500,
+    info: 6000,
+    error: 7000,
+  };
   private sub = new Subscription();
   private toastTimers = new Map<number, ReturnType<typeof setTimeout>>();
   toasts: Array<Toast & { id: number }> = [];
@@ -44,7 +49,7 @@ export class App implements OnInit, OnDestroy {
         const timer = setTimeout(() => {
           this.toasts = this.toasts.filter((item) => item.id !== id);
           this.toastTimers.delete(id);
-        }, 2500);
+        }, this.toastDurations[toast.type] ?? 5000);
         this.toastTimers.set(id, timer);
       }),
     );

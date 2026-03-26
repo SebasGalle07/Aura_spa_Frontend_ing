@@ -11,6 +11,14 @@
           <span>Total de citas</span>
         </div>
         <div>
+          <strong>{{ pendingPaymentAppointments }}</strong>
+          <span>Pendientes de pago</span>
+        </div>
+        <div>
+          <strong>{{ cancelledAppointments }}</strong>
+          <span>Canceladas</span>
+        </div>
+        <div>
           <strong>{{ completedAppointments }}</strong>
           <span>Completadas</span>
         </div>
@@ -30,7 +38,8 @@
         </label>
         <label>
           Teléfono
-          <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="phone" />
+          <input type="text" digitsOnly inputmode="numeric" autocomplete="tel" [(ngModel)]="phone" maxlength="10" />
+          <small *ngIf="user.role === 'client' && !phoneValid">Debe tener exactamente 10 digitos.</small>
         </label>
         <p class="role">Rol: {{ roleLabel(user.role) }}</p>
         <button class="btn btn--primary" type="button" (click)="saveProfile()" [disabled]="saving">
@@ -48,6 +57,14 @@
           Nueva contraseña
           <input type="password" [(ngModel)]="newPassword" />
         </label>
+        <div class="requirements">
+          <span [class.ok]="newPasswordMinOk">Minimo 8 caracteres</span>
+          <span [class.ok]="newPasswordMaxOk">Maximo 72 caracteres</span>
+          <span [class.ok]="newPasswordUppercaseOk">1 mayuscula</span>
+          <span [class.ok]="newPasswordLowercaseOk">1 minuscula</span>
+          <span [class.ok]="newPasswordDigitOk">1 numero</span>
+          <span [class.ok]="newPasswordSpecialOk">1 caracter especial</span>
+        </div>
         <label>
           Confirmar contraseña
           <input type="password" [(ngModel)]="confirmPassword" />

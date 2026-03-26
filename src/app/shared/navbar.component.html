@@ -13,18 +13,17 @@
   </button>
 
   <nav class="nav__links" [class.is-open]="menuOpen">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Inicio</a>
-    <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">Acerca de</a>
-    <a routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">Contacto</a>
-
     <ng-container *ngIf="user$ | async as user; else guest">
-      <a routerLink="/book" routerLinkActive="active" (click)="closeMenu()">Reservar</a>
-      <a routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">Mis citas</a>
+      <a *ngIf="user.role === 'client'" routerLink="/book" routerLinkActive="active" (click)="closeMenu()">Reservar</a>
+      <a *ngIf="user.role === 'client'" routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">Mis citas</a>
       <a routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">Perfil</a>
       <a *ngIf="user.role === 'admin'" routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">Admin</a>
       <button class="btn btn--ghost" (click)="logout()">Cerrar sesión</button>
     </ng-container>
     <ng-template #guest>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Inicio</a>
+      <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">Acerca de</a>
+      <a routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">Contacto</a>
       <a routerLink="/login" class="btn btn--ghost" (click)="closeMenu()">Iniciar sesión</a>
       <a routerLink="/register" class="btn btn--primary" (click)="closeMenu()">Registrarse</a>
     </ng-template>

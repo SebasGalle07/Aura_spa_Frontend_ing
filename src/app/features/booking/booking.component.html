@@ -58,7 +58,7 @@
         </button>
       </div>
       <div class="schedule">
-        <label>
+        <label class="schedule__date">
           Fecha
           <input
             type="date"
@@ -98,6 +98,14 @@
           <p>Servicio: {{ selectedService?.name }}</p>
           <p>Profesional: {{ selectedProfessional?.name }}</p>
           <p>Fecha: {{ date }} - {{ selectedTime }}</p>
+          <p>
+            <small>
+              Al reservar aceptas los
+              <a routerLink="/terminos-condiciones">T&eacute;rminos y Condiciones</a>
+              y la
+              <a routerLink="/politica-cancelacion">Pol&iacute;tica de Cancelaci&oacute;n</a>.
+            </small>
+          </p>
         </div>
         <div class="summary__form">
           <div class="summary__readonly">
@@ -118,8 +126,10 @@
               inputmode="numeric"
               autocomplete="tel"
               [(ngModel)]="clientPhone"
+              maxlength="10"
               (ngModelChange)="onClientDataChanged()"
             />
+            <small *ngIf="!clientPhoneValid">Debes registrar un telefono colombiano valido de 10 digitos.</small>
           </label>
           <label>
             Observaciones
