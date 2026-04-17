@@ -45,6 +45,8 @@ export const mapUserFromApi = (data: AnyRecord): User => ({
   phone: data.phone ?? null,
   role: data.role,
   emailVerified: data.email_verified ?? data.emailVerified ?? true,
+  isActive: data.is_active ?? data.isActive ?? true,
+  deactivatedAt: data.deactivated_at ?? data.deactivatedAt ?? null,
   createdAt: data.created_at ?? data.createdAt ?? null,
 });
 

@@ -51,6 +51,13 @@ input {
   border: 1px solid var(--taupe);
 }
 
+textarea {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--taupe);
+  resize: vertical;
+}
+
 .role {
   font-size: 13px;
   color: #6b5446;
@@ -67,4 +74,63 @@ input {
   color: #2f7d4a;
 }
 
+.danger {
+  border-color: #ead6c8;
+  background: #fffaf7;
+}
+
+.danger p {
+  margin: 0;
+  color: #6b5446;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.danger-warning {
+  background: #fff3cd;
+  border: 1px solid #f5c842;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #7a5a00 !important;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.checkbox-confirm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  flex-direction: row;
+}
+
+.checkbox-confirm input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: #c0392b;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.btn--danger {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: #a93226;
+}
+
+.btn--danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 

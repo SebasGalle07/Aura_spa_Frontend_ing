@@ -73,6 +73,31 @@
           {{ changing ? 'Actualizando...' : 'Actualizar contraseña' }}
         </button>
       </div>
+
+      <div class="card danger">
+        <h3>Cancelar inscripción</h3>
+        <p class="danger-warning">
+          <strong>⚠ Acción irreversible.</strong> Al cancelar tu inscripción, tu cuenta será
+          <strong>desactivada inmediatamente</strong>. Perderás acceso a tu historial de citas
+          y no podrás volver a iniciar sesión con este correo.
+        </p>
+        <label>
+          Motivo de la cancelación
+          <textarea rows="4" [(ngModel)]="cancellationReason" placeholder="Describe por qué deseas cancelar tu inscripción (mínimo 10 caracteres)"></textarea>
+        </label>
+        <label class="checkbox-confirm">
+          <input type="checkbox" [(ngModel)]="cancellationConfirmed" />
+          Entiendo que esta acción es <strong>irreversible</strong> y deseo continuar
+        </label>
+        <button
+          class="btn btn--danger"
+          type="button"
+          (click)="requestAccountCancellation()"
+          [disabled]="requestingCancellation || !cancellationConfirmed || cancellationReason.trim().length < 10"
+        >
+          {{ requestingCancellation ? 'Cancelando cuenta...' : 'Cancelar mi inscripción' }}
+        </button>
+      </div>
     </div>
   </div>
 </section>

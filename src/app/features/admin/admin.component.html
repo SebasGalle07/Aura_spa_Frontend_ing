@@ -12,6 +12,8 @@
       <button type="button" [class.active]="tab === 'professionals'" (click)="setTab('professionals')">Profesionales</button>
       <button type="button" [class.active]="tab === 'users'" (click)="setTab('users')">Usuarios</button>
       <button type="button" [class.active]="tab === 'company'" (click)="setTab('company')">Empresa</button>
+      <button type="button" [class.active]="tab === 'cancellations'" (click)="setTab('cancellations')">Historial cancelaciones</button>
+      <button type="button" [class.active]="tab === 'audit'" (click)="setTab('audit')">Logs BD</button>
     </div>
 
     <div class="tab" *ngIf="tab === 'summary'">
@@ -196,7 +198,7 @@
           <div class="card item" *ngFor="let user of users">
             <div>
               <strong>{{ user.name }}</strong>
-              <p>{{ user.email }} · {{ user.role }}</p>
+              <p>{{ user.email }} · {{ user.role }} · {{ user.isActive === false ? 'Desactivado' : 'Activo' }}</p>
             </div>
             <div class="actions">
               <button class="btn btn--ghost" type="button" (click)="editUser(user)">Editar</button>
@@ -282,8 +284,36 @@
         </div>
       </div>
     </div>
+
+    <div class="tab" *ngIf="tab === 'cancellations'">
+      <p class="hint">Las cancelaciones son procesadas inmediatamente por el propio cliente. Este panel muestra el historial de cuentas canceladas.</p>
+      <div class="list">
+        <div class="card item item--stacked" *ngFor="let req of cancellationRequests">
+          <div>
+            <strong>{{ userName(req.userId) }}</strong>
+            <p>Estado: <span class="tag tag--cancelled">{{ req.status }}</span> &middot; {{ req.createdAt | date: 'short' }}</p>
+            <p class="hint">{{ req.reason }}</p>
+          </div>
+        </div>
+        <p class="hint" *ngIf="!cancellationRequests.length">No hay registros de cancelaciones de inscripción.</p>
+      </div>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'audit'">
+      <div class="list">
+        <div class="card item item--stacked" *ngFor="let log of auditLogs">
+          <div>
+            <strong>{{ log.action }}</strong>
+            <p>
+              {{ log.createdAt | date: 'short' }} &middot; {{ log.entityType }} #{{ log.entityId || '-' }} &middot;
+              {{ userName(log.actorUserId) }}
+            </p>
+            <p class="hint">Nuevo: {{ auditValue(log.newValue) }}</p>
+          </div>
+        </div>
+        <p class="hint" *ngIf="!auditLogs.length">Aún no hay logs de auditoría.</p>
+      </div>
+    </div>
   </div>
 </section>
-
-
 

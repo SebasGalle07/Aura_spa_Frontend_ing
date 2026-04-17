@@ -7,6 +7,8 @@ export interface User {
   phone?: string | null;
   role: Role;
   emailVerified?: boolean;
+  isActive?: boolean;
+  deactivatedAt?: string | null;
   createdAt?: string | null;
 }
 
@@ -156,4 +158,32 @@ export interface Branding {
     section2?: string | null;
     section3?: string | null;
   };
+}
+
+export type AccountCancellationStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
+
+export interface AccountCancellationRequest {
+  id: number;
+  userId: number;
+  status: AccountCancellationStatus;
+  reason: string;
+  adminResponse?: string | null;
+  reviewedByUserId?: number | null;
+  reviewedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AuditLog {
+  id: number;
+  actorUserId?: number | null;
+  actorRole?: string | null;
+  action: string;
+  entityType: string;
+  entityId?: string | null;
+  oldValue?: Record<string, unknown> | null;
+  newValue?: Record<string, unknown> | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  createdAt: string;
 }

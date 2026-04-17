@@ -5,6 +5,7 @@ import { NgIf } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
 import { UsersService } from '../../core/users.service';
 import { AppointmentsService } from '../../core/appointments.service';
+import { SupportService } from '../../core/support.service';
 import { ToastService } from '../../core/toast.service';
 import { User } from '../../core/models';
 import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
@@ -34,11 +35,15 @@ export class ProfileComponent implements OnInit {
 
   saving = false;
   changing = false;
+  cancellationReason = '';
+  cancellationConfirmed = false;
+  requestingCancellation = false;
 
   constructor(
     private auth: AuthService,
     private usersApi: UsersService,
     private appointmentsApi: AppointmentsService,
+    private support: SupportService,
     private toast: ToastService,
   ) {}
 
@@ -115,6 +120,29 @@ export class ProfileComponent implements OnInit {
           this.toast.show(err?.error?.detail || 'No fue posible cambiar la contraseña.', 'error');
         },
       });
+  }
+
+  requestAccountCancellation(): void {
+    const reason = this.cancellationReason.trim();
+    if (reason.length < 10) {
+      this.toast.show('Indica un motivo de al menos 10 caracteres.', 'error');
+      return;
+    }
+    if (!this.cancellationConfirmed) {
+      this.toast.show('Debes confirmar que entiendes que la accion es irreversible.', 'error');
+      return;
+    }
+    this.requestingCancellation = true;
+    this.support.requestAccountCancellation(reason).subscribe({
+      next: () => {
+        this.toast.show('Tu cuenta ha sido cancelada. Hasta pronto.', 'info');
+        this.auth.logout(true);
+      },
+      error: (err) => {
+        this.requestingCancellation = false;
+        this.toast.show(err?.error?.detail || 'No fue posible cancelar la cuenta.', 'error');
+      },
+    });
   }
 
   roleLabel(role?: User['role']): string {

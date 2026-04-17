@@ -235,6 +235,30 @@
   flex-wrap: wrap;
 }
 
+.item--stacked {
+  align-items: stretch;
+  display: grid;
+}
+
+.review-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.review-grid label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.review-grid select,
+.review-grid textarea {
+  border: 1px solid var(--taupe);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
 .item__left {
   display: grid;
   gap: 6px;

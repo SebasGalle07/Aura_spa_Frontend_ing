@@ -1,27 +1,47 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
+import { DatePipe, NgFor, NgIf } from '@angular/common';
 
 import { AdminService, AdminSummary } from '../../core/admin.service';
 import { AppointmentsService } from '../../core/appointments.service';
 import { ServicesService } from '../../core/services.service';
 import { ProfessionalsService } from '../../core/professionals.service';
 import { UsersService } from '../../core/users.service';
+import { SupportService } from '../../core/support.service';
 import { CompanyService } from '../../core/company.service';
 import { ToastService } from '../../core/toast.service';
-import { Appointment, Branding, CompanyData, Professional, Service, User } from '../../core/models';
+import {
+  AccountCancellationRequest,
+  Appointment,
+  AuditLog,
+  Branding,
+  CompanyData,
+  Professional,
+  Service,
+  User,
+} from '../../core/models';
 import { mapAppointmentFromApi } from '../../core/api-mappers';
 import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
+
+type AdminTab =
+  | 'summary'
+  | 'appointments'
+  | 'services'
+  | 'professionals'
+  | 'users'
+  | 'company'
+  | 'cancellations'
+  | 'audit';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf, DigitsOnlyDirective],
+  imports: [FormsModule, NgFor, NgIf, DatePipe, DigitsOnlyDirective],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
 })
 export class AdminComponent implements OnInit {
-  tab: 'summary' | 'appointments' | 'services' | 'professionals' | 'users' | 'company' = 'summary';
+  tab: AdminTab = 'summary';
 
   summary?: AdminSummary;
   agenda: Appointment[] = [];
@@ -30,6 +50,8 @@ export class AdminComponent implements OnInit {
   services: Service[] = [];
   professionals: Professional[] = [];
   users: User[] = [];
+  cancellationRequests: AccountCancellationRequest[] = [];
+  auditLogs: AuditLog[] = [];
 
   serviceForm: Partial<Service> = { name: '', category: '', duration: 60, price: 0, active: true };
   editingServiceId?: number;
@@ -58,6 +80,7 @@ export class AdminComponent implements OnInit {
     private servicesApi: ServicesService,
     private professionalsApi: ProfessionalsService,
     private usersApi: UsersService,
+    private supportApi: SupportService,
     private companyApi: CompanyService,
     private toast: ToastService,
   ) {}
@@ -68,8 +91,14 @@ export class AdminComponent implements OnInit {
     this.loadCompany();
   }
 
-  setTab(tab: 'summary' | 'appointments' | 'services' | 'professionals' | 'users' | 'company'): void {
+  setTab(tab: AdminTab): void {
     this.tab = tab;
+    if (tab === 'cancellations') {
+      this.refreshCancellationRequests();
+    }
+    if (tab === 'audit') {
+      this.refreshAuditLogs();
+    }
   }
 
   loadSummary(): void {
@@ -86,6 +115,40 @@ export class AdminComponent implements OnInit {
     this.servicesApi.list().subscribe((items) => (this.services = items));
     this.professionalsApi.list().subscribe((items) => (this.professionals = items));
     this.usersApi.list().subscribe((items) => (this.users = items));
+    this.refreshCancellationRequests();
+    this.refreshAuditLogs();
+  }
+
+  refreshCancellationRequests(): void {
+    this.supportApi.listAccountCancellationRequests().subscribe({
+      next: (items) => {
+        this.cancellationRequests = items;
+      },
+      error: () => {
+        this.cancellationRequests = [];
+      },
+    });
+  }
+
+  refreshAuditLogs(): void {
+    this.supportApi.listAuditLogs(100).subscribe({
+      next: (items) => (this.auditLogs = items),
+      error: () => (this.auditLogs = []),
+    });
+  }
+
+  userName(userId?: number | null): string {
+    if (!userId) {
+      return 'Sistema';
+    }
+    return this.users.find((user) => user.id === userId)?.name || `Usuario #${userId}`;
+  }
+
+  auditValue(value?: Record<string, unknown> | null): string {
+    if (!value) {
+      return '-';
+    }
+    return JSON.stringify(value);
   }
 
   refreshAppointments(): void {
