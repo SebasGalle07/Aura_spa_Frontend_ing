@@ -1,4 +1,4 @@
-<section class="section">
+﻿<section class="section">
   <div class="container">
     <div class="admin__header">
       <h1>Panel de administración</h1>
@@ -8,6 +8,7 @@
     <div class="tabs">
       <button type="button" [class.active]="tab === 'summary'" (click)="setTab('summary')">Resumen</button>
       <button type="button" [class.active]="tab === 'appointments'" (click)="setTab('appointments')">Citas</button>
+      <button type="button" [class.active]="tab === 'settlements'" (click)="setTab('settlements')">Liquidaciones</button>
       <button type="button" [class.active]="tab === 'services'" (click)="setTab('services')">Servicios</button>
       <button type="button" [class.active]="tab === 'professionals'" (click)="setTab('professionals')">Profesionales</button>
       <button type="button" [class.active]="tab === 'users'" (click)="setTab('users')">Usuarios</button>
@@ -54,7 +55,7 @@
           <div class="list__item" *ngFor="let apt of agenda">
             <div>
               <strong>{{ getServiceName(apt.serviceId) }}</strong>
-              <p>{{ apt.date }} · {{ apt.time }}</p>
+              <p>{{ apt.date }} &middot; {{ apt.time }}</p>
             </div>
             <span [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
           </div>
@@ -67,8 +68,8 @@
         <div class="card apt" *ngFor="let apt of appointments">
           <div>
             <strong>{{ getServiceName(apt.serviceId) }}</strong>
-            <p>{{ apt.clientName }} · {{ apt.clientEmail }}</p>
-            <p>{{ apt.date }} · {{ apt.time }} · {{ getProfessionalName(apt.professionalId) }}</p>
+            <p>{{ apt.clientName }} &middot; {{ apt.clientEmail }}</p>
+            <p>{{ apt.date }} &middot; {{ apt.time }} &middot; {{ getProfessionalName(apt.professionalId) }}</p>
           </div>
           <div class="apt__actions">
             <span [class]="statusClass(apt.status)">{{ statusLabel(apt.status) }}</span>
@@ -92,6 +93,79 @@
       </div>
     </div>
 
+    <div class="tab" *ngIf="tab === 'settlements'">
+      <div class="list" *ngIf="settlements.length; else noSettlements">
+        <div class="card item item--stacked" *ngFor="let settlement of settlements">
+          <div>
+            <strong>{{ settlementClientName(settlement) }}</strong>
+            <p>
+              {{ getServiceName(settlement.serviceId) }} &middot; Cita #{{ settlement.appointmentId }}
+              <span [class]="settlementStatusClass(settlement.status)">{{ settlementStatusLabel(settlement.status) }}</span>
+            </p>
+            <p class="hint">
+              Total: {{ money(settlement.totalAmount) }} &middot;
+              Anticipo: {{ money(settlement.depositAmount) }} &middot;
+              Pagado: {{ money(settlement.paidAmount) }} &middot;
+              Saldo: {{ money(settlement.balanceAmount) }}
+            </p>
+            <p class="hint" *ngIf="latestReceipt(settlement)">
+              Comprobante: {{ latestReceipt(settlement)?.receiptNumber }} &middot;
+              Emitido: {{ latestReceipt(settlement)?.issuedAt | date: 'short' }}
+            </p>
+          </div>
+
+          <div class="settlement-payment" *ngIf="settlement.status === 'pending_settlement' || settlement.status === 'partially_paid'">
+            <label>
+              Valor a pagar
+              <input
+                type="number"
+                [ngModel]="ensureSettlementPaymentForm(settlement).amount"
+                (ngModelChange)="ensureSettlementPaymentForm(settlement).amount = $event"
+              />
+            </label>
+            <label>
+              Metodo
+              <select
+                [ngModel]="ensureSettlementPaymentForm(settlement).method"
+                (ngModelChange)="ensureSettlementPaymentForm(settlement).method = $event"
+              >
+                <option value="cash">Efectivo</option>
+                <option value="card">Tarjeta</option>
+                <option value="transfer">Transferencia</option>
+                <option value="wompi">Wompi</option>
+                <option value="payu">PayU</option>
+              </select>
+            </label>
+            <label>
+              Referencia
+              <input
+                type="text"
+                [ngModel]="ensureSettlementPaymentForm(settlement).reference"
+                (ngModelChange)="ensureSettlementPaymentForm(settlement).reference = $event"
+              />
+            </label>
+            <label>
+              Notas
+              <input
+                type="text"
+                [ngModel]="ensureSettlementPaymentForm(settlement).notes"
+                (ngModelChange)="ensureSettlementPaymentForm(settlement).notes = $event"
+              />
+            </label>
+            <button class="btn btn--primary" type="button" (click)="registerSettlementPayment(settlement)">Registrar pago</button>
+          </div>
+
+          <div class="actions" *ngIf="settlement.status === 'settled'">
+            <button class="btn btn--secondary" type="button" (click)="issueSettlementReceipt(settlement)">
+              {{ latestReceipt(settlement) ? 'Ver comprobante' : 'Generar comprobante' }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #noSettlements>
+        <p class="hint">No hay liquidaciones registradas todavía.</p>
+      </ng-template>
+    </div>
     <div class="tab" *ngIf="tab === 'services'">
       <div class="form-grid">
         <div class="card form">
@@ -123,7 +197,7 @@
               </ng-template>
 
               <strong>{{ service.name }}</strong>
-              <p>{{ service.category }} · {{ service.duration }} min</p>
+              <p>{{ service.category }} &middot; {{ service.duration }} min</p>
             </div>
             <div class="actions">
               <label class="file-upload file-upload--compact">
@@ -165,7 +239,7 @@
           <div class="card item" *ngFor="let pro of professionals">
             <div>
               <strong>{{ pro.name }}</strong>
-              <p>{{ pro.specialty }} · {{ pro.scheduleStart }} - {{ pro.scheduleEnd }}</p>
+              <p>{{ pro.specialty }} &middot; {{ pro.scheduleStart }} - {{ pro.scheduleEnd }}</p>
             </div>
             <button class="btn btn--ghost" type="button" (click)="editProfessional(pro)">Editar</button>
           </div>
@@ -198,7 +272,7 @@
           <div class="card item" *ngFor="let user of users">
             <div>
               <strong>{{ user.name }}</strong>
-              <p>{{ user.email }} · {{ user.role }} · {{ user.isActive === false ? 'Desactivado' : 'Activo' }}</p>
+              <p>{{ user.email }} &middot; {{ user.role }} &middot; {{ user.isActive === false ? 'Desactivado' : 'Activo' }}</p>
             </div>
             <div class="actions">
               <button class="btn btn--ghost" type="button" (click)="editUser(user)">Editar</button>
@@ -316,4 +390,7 @@
     </div>
   </div>
 </section>
+
+
+
 

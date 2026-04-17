@@ -187,3 +187,50 @@ export interface AuditLog {
   userAgent?: string | null;
   createdAt: string;
 }
+
+export type SettlementStatus = 'pending_settlement' | 'partially_paid' | 'settled' | 'voided';
+
+export interface SettlementPayment {
+  id: number;
+  settlementId: number;
+  amount: number | string;
+  method: string;
+  reference: string | null;
+  notes: string | null;
+  createdByUserId: number | null;
+  createdAt: string;
+}
+
+export interface SettlementReceipt {
+  id: number;
+  settlementId: number;
+  receiptNumber: string;
+  totalAmount: number | string;
+  issuedAt: string;
+  receiptPayload: Record<string, unknown>;
+}
+
+export interface ServiceSettlement {
+  id: number;
+  appointmentId: number;
+  clientUserId: number | null;
+  serviceId: number;
+  totalAmount: number | string;
+  depositAmount: number | string;
+  balanceAmount: number | string;
+  paidAmount: number | string;
+  status: SettlementStatus;
+  settledAt: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  payments: SettlementPayment[];
+  receipts: SettlementReceipt[];
+}
+
+export interface SettlementPaymentCreate {
+  amount: number;
+  method: string;
+  reference: string | null;
+  notes: string | null;
+}

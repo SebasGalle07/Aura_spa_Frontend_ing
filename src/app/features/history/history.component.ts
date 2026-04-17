@@ -6,7 +6,8 @@ import { AppointmentsService } from '../../core/appointments.service';
 import { ServicesService } from '../../core/services.service';
 import { ProfessionalsService } from '../../core/professionals.service';
 import { ToastService } from '../../core/toast.service';
-import { Appointment, Professional, Service } from '../../core/models';
+import { SettlementsService } from '../../core/settlements.service';
+import { Appointment, Professional, Service, ServiceSettlement, SettlementReceipt } from '../../core/models';
 
 @Component({
   selector: 'app-history',
@@ -20,11 +21,14 @@ export class HistoryComponent implements OnInit {
   services: Service[] = [];
   professionals: Professional[] = [];
   loading = true;
+  settlements: ServiceSettlement[] = [];
+  receipts: Record<number, SettlementReceipt> = {};
 
   constructor(
     private appointmentsApi: AppointmentsService,
     private servicesApi: ServicesService,
     private professionalsApi: ProfessionalsService,
+    private settlementsApi: SettlementsService,
     private toast: ToastService,
     private router: Router,
   ) {}
@@ -56,6 +60,14 @@ export class HistoryComponent implements OnInit {
       },
       error: () => {
         this.professionals = [];
+      },
+    });
+    this.settlementsApi.listMine().subscribe({
+      next: (settlements) => {
+        this.settlements = settlements;
+      },
+      error: () => {
+        this.settlements = [];
       },
     });
   }
@@ -146,7 +158,51 @@ export class HistoryComponent implements OnInit {
     });
   }
 
+  settlementForAppointment(appointmentId: number): ServiceSettlement | undefined {
+    return this.settlements.find((settlement) => settlement.appointmentId === appointmentId);
+  }
+
+  settlementStatusLabel(status: ServiceSettlement['status']): string {
+    const labels: Record<string, string> = {
+      pending_settlement: 'Pendiente de liquidación',
+      partially_paid: 'Parcialmente pagada',
+      settled: 'Liquidada',
+      voided: 'Anulada',
+    };
+    return labels[status] || status;
+  }
+
+  settlementStatusClass(status: ServiceSettlement['status']): string {
+    const classes: Record<string, string> = {
+      pending_settlement: 'tag tag--pending',
+      partially_paid: 'tag tag--rescheduled',
+      settled: 'tag tag--confirmed',
+      voided: 'tag tag--cancelled',
+    };
+    return classes[status] || 'tag';
+  }
+
+  money(value: number | string | null | undefined): string {
+    return Number(value || 0).toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+  }
+
+  latestReceipt(settlement: ServiceSettlement): SettlementReceipt | undefined {
+    return this.receipts[settlement.id] || settlement.receipts?.[settlement.receipts.length - 1];
+  }
+
+  loadReceipt(settlement: ServiceSettlement): void {
+    this.settlementsApi.getReceipt(settlement.id).subscribe({
+      next: (receipt) => {
+        this.receipts[settlement.id] = receipt;
+        this.toast.show(`Comprobante ${receipt.receiptNumber} cargado.`, 'success');
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'El comprobante aún no está disponible.', 'error');
+      },
+    });
+  }
   private toDateTime(apt: Appointment): Date {
     return new Date(`${apt.date}T${apt.time}:00`);
   }
 }
+

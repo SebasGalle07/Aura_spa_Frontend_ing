@@ -9,6 +9,7 @@ import { ProfessionalsService } from '../../core/professionals.service';
 import { UsersService } from '../../core/users.service';
 import { SupportService } from '../../core/support.service';
 import { CompanyService } from '../../core/company.service';
+import { SettlementsService } from '../../core/settlements.service';
 import { ToastService } from '../../core/toast.service';
 import {
   AccountCancellationRequest,
@@ -18,6 +19,8 @@ import {
   CompanyData,
   Professional,
   Service,
+  ServiceSettlement,
+  SettlementReceipt,
   User,
 } from '../../core/models';
 import { mapAppointmentFromApi } from '../../core/api-mappers';
@@ -26,6 +29,7 @@ import { DigitsOnlyDirective } from '../../shared/digits-only.directive';
 type AdminTab =
   | 'summary'
   | 'appointments'
+  | 'settlements'
   | 'services'
   | 'professionals'
   | 'users'
@@ -52,6 +56,9 @@ export class AdminComponent implements OnInit {
   users: User[] = [];
   cancellationRequests: AccountCancellationRequest[] = [];
   auditLogs: AuditLog[] = [];
+  settlements: ServiceSettlement[] = [];
+  settlementReceipts: Record<number, SettlementReceipt> = {};
+  settlementPaymentForms: Record<number, { amount: number | null; method: string; reference: string; notes: string }> = {};
 
   serviceForm: Partial<Service> = { name: '', category: '', duration: 60, price: 0, active: true };
   editingServiceId?: number;
@@ -82,6 +89,7 @@ export class AdminComponent implements OnInit {
     private usersApi: UsersService,
     private supportApi: SupportService,
     private companyApi: CompanyService,
+    private settlementsApi: SettlementsService,
     private toast: ToastService,
   ) {}
 
@@ -93,6 +101,9 @@ export class AdminComponent implements OnInit {
 
   setTab(tab: AdminTab): void {
     this.tab = tab;
+    if (tab === 'settlements') {
+      this.refreshSettlements();
+    }
     if (tab === 'cancellations') {
       this.refreshCancellationRequests();
     }
@@ -117,8 +128,111 @@ export class AdminComponent implements OnInit {
     this.usersApi.list().subscribe((items) => (this.users = items));
     this.refreshCancellationRequests();
     this.refreshAuditLogs();
+    this.refreshSettlements();
   }
 
+  refreshSettlements(): void {
+    this.settlementsApi.listAll().subscribe({
+      next: (items) => {
+        this.settlements = items;
+        for (const settlement of items) {
+          this.ensureSettlementPaymentForm(settlement);
+        }
+      },
+      error: () => {
+        this.settlements = [];
+      },
+    });
+  }
+
+  ensureSettlementPaymentForm(settlement: ServiceSettlement): { amount: number | null; method: string; reference: string; notes: string } {
+    if (!this.settlementPaymentForms[settlement.id]) {
+      this.settlementPaymentForms[settlement.id] = {
+        amount: Number(settlement.balanceAmount || 0),
+        method: 'cash',
+        reference: '',
+        notes: '',
+      };
+    }
+    return this.settlementPaymentForms[settlement.id];
+  }
+
+  settlementStatusLabel(status: ServiceSettlement['status']): string {
+    const labels: Record<string, string> = {
+      pending_settlement: 'Pendiente de liquidación',
+      partially_paid: 'Parcialmente pagada',
+      settled: 'Liquidada',
+      voided: 'Anulada',
+    };
+    return labels[status] || status;
+  }
+
+  settlementStatusClass(status: ServiceSettlement['status']): string {
+    const classes: Record<string, string> = {
+      pending_settlement: 'tag tag--pending',
+      partially_paid: 'tag tag--rescheduled',
+      settled: 'tag tag--confirmed',
+      voided: 'tag tag--cancelled',
+    };
+    return classes[status] || 'tag';
+  }
+
+  settlementAppointment(settlement: ServiceSettlement): Appointment | undefined {
+    return this.appointments.find((apt) => apt.id === settlement.appointmentId);
+  }
+
+  settlementClientName(settlement: ServiceSettlement): string {
+    return this.settlementAppointment(settlement)?.clientName || `Cliente #${settlement.clientUserId || '-'}`;
+  }
+
+  money(value: number | string | null | undefined): string {
+    return Number(value || 0).toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+  }
+
+  latestReceipt(settlement: ServiceSettlement): SettlementReceipt | undefined {
+    return this.settlementReceipts[settlement.id] || settlement.receipts?.[settlement.receipts.length - 1];
+  }
+
+  registerSettlementPayment(settlement: ServiceSettlement): void {
+    const form = this.ensureSettlementPaymentForm(settlement);
+    const amount = Number(form.amount || 0);
+    if (amount <= 0) {
+      this.toast.show('El valor del pago debe ser mayor a cero.', 'error');
+      return;
+    }
+    this.settlementsApi.registerPayment(settlement.id, {
+      amount,
+      method: form.method,
+      reference: form.reference || null,
+      notes: form.notes || null,
+    }).subscribe({
+      next: (updated) => {
+        this.settlements = this.settlements.map((item) => (item.id === updated.id ? updated : item));
+        this.settlementPaymentForms[updated.id] = {
+          amount: Number(updated.balanceAmount || 0),
+          method: 'cash',
+          reference: '',
+          notes: '',
+        };
+        this.toast.show('Pago registrado en la liquidación.', 'success');
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'No fue posible registrar el pago.', 'error');
+      },
+    });
+  }
+
+  issueSettlementReceipt(settlement: ServiceSettlement): void {
+    this.settlementsApi.issueReceipt(settlement.id).subscribe({
+      next: (receipt) => {
+        this.settlementReceipts[settlement.id] = receipt;
+        this.toast.show(`Comprobante ${receipt.receiptNumber} generado.`, 'success');
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'No fue posible generar el comprobante.', 'error');
+      },
+    });
+  }
   refreshCancellationRequests(): void {
     this.supportApi.listAccountCancellationRequests().subscribe({
       next: (items) => {
@@ -449,6 +563,7 @@ export class AdminComponent implements OnInit {
     });
   }
 }
+
 
 
 

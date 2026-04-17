@@ -26,6 +26,32 @@
             Cancelar
           </button>
         </div>
+        <div class="settlement-card" *ngIf="settlementForAppointment(apt.id) as settlement">
+          <div>
+            <strong>Liquidación del servicio</strong>
+            <p>
+              Total: {{ money(settlement.totalAmount) }} &middot;
+              Anticipo: {{ money(settlement.depositAmount) }} &middot;
+              Pagado: {{ money(settlement.paidAmount) }} &middot;
+              Saldo: {{ money(settlement.balanceAmount) }}
+            </p>
+            <p *ngIf="latestReceipt(settlement)">
+              Comprobante: {{ latestReceipt(settlement)?.receiptNumber }} &middot;
+              Emitido: {{ latestReceipt(settlement)?.issuedAt | date: 'short' }}
+            </p>
+          </div>
+          <div class="apt__meta">
+            <span [class]="settlementStatusClass(settlement.status)">{{ settlementStatusLabel(settlement.status) }}</span>
+            <button
+              class="btn btn--secondary"
+              type="button"
+              *ngIf="settlement.status === 'settled'"
+              (click)="loadReceipt(settlement)"
+            >
+              Ver comprobante
+            </button>
+          </div>
+        </div>
       </article>
     </div>
 
@@ -35,6 +61,7 @@
     </div>
   </div>
 </section>
+
 
 
 

@@ -97,3 +97,24 @@ h1 {
 }
 
 
+
+.settlement-card {
+  width: 100%;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(139, 111, 94, 0.22);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settlement-card strong {
+  color: #3d2b24;
+}
+
+.settlement-card p {
+  margin: 4px 0 0;
+  color: #5a463a;
+  font-size: 14px;
+}

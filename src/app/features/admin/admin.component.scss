@@ -281,3 +281,17 @@
   background: linear-gradient(135deg, #efe6dc, #e4d5c6);
 }
 
+
+.settlement-payment {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.item--stacked {
+  align-items: stretch;
+  flex-direction: column;
+}
