@@ -49,18 +49,6 @@ export class SupportService {
       .pipe(map((items) => items.map(mapCancellation)));
   }
 
-  reviewAccountCancellationRequest(
-    id: number,
-    payload: { status: AccountCancellationRequest['status']; adminResponse?: string | null },
-  ): Observable<AccountCancellationRequest> {
-    return this.http
-      .put<AnyRecord>(`${environment.apiUrl}/account-cancellation-requests/${id}`, {
-        status: payload.status,
-        admin_response: payload.adminResponse ?? null,
-      })
-      .pipe(map(mapCancellation));
-  }
-
   listAuditLogs(limit = 100, offset = 0): Observable<AuditLog[]> {
     return this.http
       .get<AnyRecord[]>(`${environment.apiUrl}/audit-logs?limit=${limit}&offset=${offset}`)
