@@ -323,7 +323,14 @@ export class AdminComponent implements OnInit {
     this.appointmentsApi.cancel(apt.id).subscribe((updated) => this.updateAppointment(updated, 'Cita cancelada.'));
   }
 
+  canReschedule(apt: Appointment): boolean {
+    return apt.status === 'confirmed';
+  }
+
   openReschedule(apt: Appointment): void {
+    if (!this.canReschedule(apt)) {
+      return;
+    }
     this.rescheduleId = apt.id;
     this.rescheduleDate = apt.date;
     this.rescheduleTime = apt.time;

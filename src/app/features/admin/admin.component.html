@@ -76,9 +76,11 @@
             <button class="btn btn--ghost" type="button" (click)="confirm(apt)">Confirmar</button>
             <button class="btn btn--ghost" type="button" (click)="attend(apt)">Atendida</button>
             <button class="btn btn--ghost" type="button" (click)="cancel(apt)">Cancelar</button>
-            <button class="btn btn--secondary" type="button" (click)="openReschedule(apt)">Reprogramar</button>
+            <button class="btn btn--secondary" type="button" *ngIf="canReschedule(apt)" (click)="openReschedule(apt)">
+              Reprogramar
+            </button>
           </div>
-          <div class="reschedule" *ngIf="rescheduleId === apt.id">
+          <div class="reschedule" *ngIf="rescheduleId === apt.id && canReschedule(apt)">
             <label>
               Nueva fecha
               <input type="date" [(ngModel)]="rescheduleDate" />
