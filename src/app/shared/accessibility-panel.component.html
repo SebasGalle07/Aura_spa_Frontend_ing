@@ -22,12 +22,12 @@
   id="a11y-panel"
   *ngIf="open"
   role="dialog"
-  aria-label="Herramientas de accesibilidad"
+  aria-labelledby="a11y-panel-title"
   aria-modal="true"
 >
   <header>
-    <h3>Herramientas de accesibilidad</h3>
-    <button type="button" class="close-btn" aria-label="Cerrar panel" (click)="closePanel()">×</button>
+    <h3 id="a11y-panel-title">Herramientas de accesibilidad</h3>
+    <button type="button" class="close-btn" aria-label="Cerrar panel" (click)="closePanel()">&times;</button>
   </header>
 
   <div class="a11y-content" *ngIf="settings$ | async as settings">
@@ -71,7 +71,7 @@
         [attr.aria-pressed]="settings.lowSaturation"
         (click)="accessibility.setLowSaturation(!settings.lowSaturation)"
       >
-        Baja saturación
+        Baja saturaci&oacute;n
       </button>
       <button
         type="button"
@@ -79,7 +79,7 @@
         [attr.aria-pressed]="settings.highSaturation"
         (click)="accessibility.setHighSaturation(!settings.highSaturation)"
       >
-        Alta saturación
+        Alta saturaci&oacute;n
       </button>
       <button
         type="button"
@@ -95,7 +95,7 @@
         [attr.aria-pressed]="settings.highlightHeadings"
         (click)="accessibility.setHighlightHeadings(!settings.highlightHeadings)"
       >
-        Resaltar títulos
+        Resaltar t&iacute;tulos
       </button>
       <button
         type="button"
@@ -108,7 +108,7 @@
     </div>
 
     <section class="metric">
-      <h4>Tamaño de fuente</h4>
+      <h4>Tama&ntilde;o de fuente</h4>
       <div class="metric-row">
         <button type="button" (click)="accessibility.decreaseFontScale()">A-</button>
         <span>{{ (settings.fontScale * 100).toFixed(0) }}%</span>
@@ -126,7 +126,7 @@
     </section>
 
     <section class="metric">
-      <h4>Altura de línea</h4>
+      <h4>Altura de l&iacute;nea</h4>
       <input
         type="range"
         min="1.2"
