@@ -36,15 +36,31 @@
 
 <div class="modal-backdrop" *ngIf="detailService as service" (click)="closeDetails()">
   <article class="card modal" (click)="$event.stopPropagation()">
-    <h2>{{ service.name }}</h2>
-    <p class="modal__category">{{ service.category }} · {{ service.duration }} min</p>
-    <p class="modal__description">{{ describe(service) }}</p>
-    <p class="modal__price">{{ formatPrice(service.price) }}</p>
 
-    <div class="modal__actions">
-      <button type="button" class="btn btn--secondary" (click)="closeDetails()">Cerrar</button>
-      <button type="button" class="btn btn--primary" (click)="reserve(service)">Reservar este servicio</button>
+    <div class="modal__image"
+         [class.modal__image--placeholder]="!service.image"
+         [style.backgroundImage]="service.image ? 'url(' + service.image + ')' : ''">
     </div>
+
+    <div class="modal__content">
+      <p class="modal__category">{{ service.category }} · {{ service.duration }} min</p>
+      <h2>{{ service.name }}</h2>
+
+      <p class="modal__description">{{ detailServiceInfo?.description }}</p>
+
+      <ul class="modal__highlights" *ngIf="detailServiceInfo?.highlights?.length">
+        <li *ngFor="let item of detailServiceInfo!.highlights">{{ item }}</li>
+      </ul>
+
+      <div class="modal__footer">
+        <p class="modal__price">{{ formatPrice(service.price) }}</p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--secondary" (click)="closeDetails()">Cerrar</button>
+          <button type="button" class="btn btn--primary" (click)="reserve(service)">Reservar ahora</button>
+        </div>
+      </div>
+    </div>
+
   </article>
 </div>
 
