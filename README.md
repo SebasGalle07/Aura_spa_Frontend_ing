@@ -2,6 +2,26 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
 
+## CI/CD en GitHub Actions
+Este repositorio incluye dos workflows:
+
+- `Frontend CI`: instala dependencias, compila y ejecuta pruebas en cada `push` y `pull request`.
+- `Frontend CD`: construye la imagen Docker y despliega a Cloud Run cuando hay `push` a `main` o `master`, o por ejecucion manual.
+
+### Variables de repositorio requeridas
+Configura en GitHub `Settings > Secrets and variables > Actions > Variables`:
+
+- `GCP_PROJECT_ID`
+- `GCP_REGION`
+- `ARTIFACT_REPOSITORY`
+- `CLOUD_RUN_FRONTEND_SERVICE`
+
+### Secrets requeridos
+Configura en GitHub `Settings > Secrets and variables > Actions > Secrets`:
+
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`
+- `GCP_SERVICE_ACCOUNT_EMAIL`
+
 ## Development server
 
 To start a local development server, run:
