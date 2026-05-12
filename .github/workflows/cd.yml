@@ -41,13 +41,16 @@ jobs:
       - name: Configure Docker auth
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
-      - name: Build and push image
+      - name: Build Docker image
         env:
           IMAGE_TAG: frontend-${{ github.sha }}
         run: |
           IMAGE_URI="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REPOSITORY}/aura-spa-frontend:${IMAGE_TAG}"
           echo "IMAGE_URI=${IMAGE_URI}" >> "$GITHUB_ENV"
-          gcloud builds submit --tag "${IMAGE_URI}" .
+          docker build -t "${IMAGE_URI}" .
+
+      - name: Push Docker image
+        run: docker push "${IMAGE_URI}"
 
       - name: Deploy frontend service
         run: |
