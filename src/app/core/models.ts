@@ -188,6 +188,37 @@ export interface AuditLog {
   createdAt: string;
 }
 
+export type ServiceCaseType = 'petition' | 'complaint' | 'claim' | 'suggestion';
+export type ServiceCaseStatus = 'open' | 'in_review' | 'resolved' | 'closed' | 'rejected';
+
+export interface ServiceCase {
+  id: number;
+  appointmentId: number;
+  clientUserId: number;
+  caseType: ServiceCaseType;
+  subject: string;
+  description: string;
+  status: ServiceCaseStatus;
+  adminResponse?: string | null;
+  reviewedByUserId?: number | null;
+  reviewedAt?: string | null;
+  closedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ServiceCaseCreate {
+  appointmentId: number;
+  caseType: ServiceCaseType;
+  subject: string;
+  description: string;
+}
+
+export interface ServiceCaseReview {
+  status: ServiceCaseStatus;
+  adminResponse?: string | null;
+}
+
 export type SettlementStatus = 'pending_settlement' | 'partially_paid' | 'settled' | 'voided';
 
 export interface SettlementPayment {

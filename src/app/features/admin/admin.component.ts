@@ -19,6 +19,7 @@ import {
   CompanyData,
   Professional,
   Service,
+  ServiceCase,
   ServiceSettlement,
   SettlementReceipt,
   User,
@@ -34,6 +35,7 @@ type AdminTab =
   | 'professionals'
   | 'users'
   | 'company'
+  | 'serviceCases'
   | 'cancellations'
   | 'audit';
 
@@ -55,10 +57,12 @@ export class AdminComponent implements OnInit {
   professionals: Professional[] = [];
   users: User[] = [];
   cancellationRequests: AccountCancellationRequest[] = [];
+  serviceCases: ServiceCase[] = [];
   auditLogs: AuditLog[] = [];
   settlements: ServiceSettlement[] = [];
   settlementReceipts: Record<number, SettlementReceipt> = {};
   settlementPaymentForms: Record<number, { amount: number | null; method: string; reference: string; notes: string }> = {};
+  serviceCaseReviewForms: Record<number, { status: ServiceCase['status']; adminResponse: string }> = {};
 
   serviceForm: Partial<Service> = { name: '', category: '', duration: 60, price: 0, active: true };
   editingServiceId?: number;
@@ -107,6 +111,9 @@ export class AdminComponent implements OnInit {
     if (tab === 'cancellations') {
       this.refreshCancellationRequests();
     }
+    if (tab === 'serviceCases') {
+      this.refreshServiceCases();
+    }
     if (tab === 'audit') {
       this.refreshAuditLogs();
     }
@@ -126,6 +133,7 @@ export class AdminComponent implements OnInit {
     this.servicesApi.list().subscribe((items) => (this.services = items));
     this.professionalsApi.list().subscribe((items) => (this.professionals = items));
     this.usersApi.list().subscribe((items) => (this.users = items));
+    this.refreshServiceCases();
     this.refreshCancellationRequests();
     this.refreshAuditLogs();
     this.refreshSettlements();
@@ -244,6 +252,20 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  refreshServiceCases(): void {
+    this.supportApi.listServiceCases().subscribe({
+      next: (items) => {
+        this.serviceCases = items;
+        for (const item of items) {
+          this.ensureServiceCaseReviewForm(item);
+        }
+      },
+      error: () => {
+        this.serviceCases = [];
+      },
+    });
+  }
+
   refreshAuditLogs(): void {
     this.supportApi.listAuditLogs(100).subscribe({
       next: (items) => (this.auditLogs = items),
@@ -263,6 +285,68 @@ export class AdminComponent implements OnInit {
       return '-';
     }
     return JSON.stringify(value);
+  }
+
+  ensureServiceCaseReviewForm(serviceCase: ServiceCase): { status: ServiceCase['status']; adminResponse: string } {
+    if (!this.serviceCaseReviewForms[serviceCase.id]) {
+      this.serviceCaseReviewForms[serviceCase.id] = {
+        status: serviceCase.status,
+        adminResponse: serviceCase.adminResponse || '',
+      };
+    }
+    return this.serviceCaseReviewForms[serviceCase.id];
+  }
+
+  serviceCaseTypeLabel(caseType: ServiceCase['caseType']): string {
+    const labels: Record<string, string> = {
+      petition: 'Petición',
+      complaint: 'Queja',
+      claim: 'Reclamo',
+      suggestion: 'Sugerencia',
+    };
+    return labels[caseType] || caseType;
+  }
+
+  serviceCaseStatusLabel(status: ServiceCase['status']): string {
+    const labels: Record<string, string> = {
+      open: 'Abierta',
+      in_review: 'En revisión',
+      resolved: 'Resuelta',
+      closed: 'Cerrada',
+      rejected: 'Rechazada',
+    };
+    return labels[status] || status;
+  }
+
+  serviceCaseStatusClass(status: ServiceCase['status']): string {
+    const classes: Record<string, string> = {
+      open: 'tag tag--pending',
+      in_review: 'tag tag--rescheduled',
+      resolved: 'tag tag--confirmed',
+      closed: 'tag tag--completed',
+      rejected: 'tag tag--cancelled',
+    };
+    return classes[status] || 'tag';
+  }
+
+  reviewServiceCase(serviceCase: ServiceCase): void {
+    const form = this.ensureServiceCaseReviewForm(serviceCase);
+    this.supportApi.reviewServiceCase(serviceCase.id, {
+      status: form.status,
+      adminResponse: form.adminResponse || null,
+    }).subscribe({
+      next: (updated) => {
+        this.serviceCases = this.serviceCases.map((item) => (item.id === updated.id ? updated : item));
+        this.serviceCaseReviewForms[updated.id] = {
+          status: updated.status,
+          adminResponse: updated.adminResponse || '',
+        };
+        this.toast.show('PQRS actualizada correctamente.', 'success');
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.detail || 'No fue posible actualizar la PQRS.', 'error');
+      },
+    });
   }
 
   refreshAppointments(): void {

@@ -13,6 +13,7 @@
       <button type="button" [class.active]="tab === 'professionals'" (click)="setTab('professionals')">Profesionales</button>
       <button type="button" [class.active]="tab === 'users'" (click)="setTab('users')">Usuarios</button>
       <button type="button" [class.active]="tab === 'company'" (click)="setTab('company')">Empresa</button>
+      <button type="button" [class.active]="tab === 'serviceCases'" (click)="setTab('serviceCases')">PQRS</button>
       <button type="button" [class.active]="tab === 'cancellations'" (click)="setTab('cancellations')">Historial cancelaciones</button>
       <button type="button" [class.active]="tab === 'audit'" (click)="setTab('audit')">Logs BD</button>
     </div>
@@ -358,6 +359,55 @@
 
           <button class="btn btn--primary" type="button" (click)="saveBranding()">Guardar branding</button>
         </div>
+      </div>
+    </div>
+
+    <div class="tab" *ngIf="tab === 'serviceCases'">
+      <p class="hint">Este panel centraliza las peticiones, quejas, reclamos y sugerencias posteriores a servicios ya liquidados.</p>
+      <div class="list">
+        <div class="card item item--stacked" *ngFor="let item of serviceCases">
+          <div>
+            <strong>{{ serviceCaseTypeLabel(item.caseType) }} &middot; {{ item.subject }}</strong>
+            <p>
+              {{ userName(item.clientUserId) }} &middot; Cita #{{ item.appointmentId }} &middot;
+              {{ item.createdAt | date: 'short' }}
+            </p>
+            <p>
+              <span [class]="serviceCaseStatusClass(item.status)">{{ serviceCaseStatusLabel(item.status) }}</span>
+            </p>
+            <p class="hint">{{ item.description }}</p>
+            <p class="hint" *ngIf="item.adminResponse">
+              Respuesta actual: {{ item.adminResponse }}
+            </p>
+          </div>
+          <div class="settlement-payment">
+            <label>
+              Estado
+              <select
+                [ngModel]="ensureServiceCaseReviewForm(item).status"
+                (ngModelChange)="ensureServiceCaseReviewForm(item).status = $event"
+              >
+                <option value="open">Abierta</option>
+                <option value="in_review">En revisión</option>
+                <option value="resolved">Resuelta</option>
+                <option value="closed">Cerrada</option>
+                <option value="rejected">Rechazada</option>
+              </select>
+            </label>
+            <label>
+              Respuesta administrativa
+              <textarea
+                rows="3"
+                [ngModel]="ensureServiceCaseReviewForm(item).adminResponse"
+                (ngModelChange)="ensureServiceCaseReviewForm(item).adminResponse = $event"
+              ></textarea>
+            </label>
+            <button class="btn btn--primary" type="button" (click)="reviewServiceCase(item)">
+              Guardar gestión
+            </button>
+          </div>
+        </div>
+        <p class="hint" *ngIf="!serviceCases.length">No hay PQRS registradas por el momento.</p>
       </div>
     </div>
 

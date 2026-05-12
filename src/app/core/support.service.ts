@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { AccountCancellationRequest, AuditLog } from './models';
+import { AccountCancellationRequest, AuditLog, ServiceCase, ServiceCaseCreate, ServiceCaseReview } from './models';
 
 type AnyRecord = Record<string, any>;
 
@@ -33,6 +33,22 @@ const mapAuditLog = (data: AnyRecord): AuditLog => ({
   createdAt: data['created_at'] ?? data['createdAt'],
 });
 
+const mapServiceCase = (data: AnyRecord): ServiceCase => ({
+  id: data['id'],
+  appointmentId: data['appointment_id'] ?? data['appointmentId'],
+  clientUserId: data['client_user_id'] ?? data['clientUserId'],
+  caseType: data['case_type'] ?? data['caseType'],
+  subject: data['subject'],
+  description: data['description'],
+  status: data['status'],
+  adminResponse: data['admin_response'] ?? data['adminResponse'] ?? null,
+  reviewedByUserId: data['reviewed_by_user_id'] ?? data['reviewedByUserId'] ?? null,
+  reviewedAt: data['reviewed_at'] ?? data['reviewedAt'] ?? null,
+  closedAt: data['closed_at'] ?? data['closedAt'] ?? null,
+  createdAt: data['created_at'] ?? data['createdAt'],
+  updatedAt: data['updated_at'] ?? data['updatedAt'],
+});
+
 @Injectable({ providedIn: 'root' })
 export class SupportService {
   constructor(private http: HttpClient) {}
@@ -53,5 +69,37 @@ export class SupportService {
     return this.http
       .get<AnyRecord[]>(`${environment.apiUrl}/audit-logs?limit=${limit}&offset=${offset}`)
       .pipe(map((items) => items.map(mapAuditLog)));
+  }
+
+  createMyServiceCase(payload: ServiceCaseCreate): Observable<ServiceCase> {
+    return this.http
+      .post<AnyRecord>(`${environment.apiUrl}/service-cases/me`, {
+        appointment_id: payload.appointmentId,
+        case_type: payload.caseType,
+        subject: payload.subject,
+        description: payload.description,
+      })
+      .pipe(map(mapServiceCase));
+  }
+
+  listMyServiceCases(): Observable<ServiceCase[]> {
+    return this.http
+      .get<AnyRecord[]>(`${environment.apiUrl}/service-cases/my`)
+      .pipe(map((items) => items.map(mapServiceCase)));
+  }
+
+  listServiceCases(): Observable<ServiceCase[]> {
+    return this.http
+      .get<AnyRecord[]>(`${environment.apiUrl}/service-cases`)
+      .pipe(map((items) => items.map(mapServiceCase)));
+  }
+
+  reviewServiceCase(caseId: number, payload: ServiceCaseReview): Observable<ServiceCase> {
+    return this.http
+      .post<AnyRecord>(`${environment.apiUrl}/service-cases/${caseId}/review`, {
+        status: payload.status,
+        admin_response: payload.adminResponse ?? null,
+      })
+      .pipe(map(mapServiceCase));
   }
 }
