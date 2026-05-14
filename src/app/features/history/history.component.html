@@ -51,68 +51,13 @@
             >
               Ver comprobante
             </button>
-          </div>
-        </div>
-
-        <div class="settlement-card" *ngIf="serviceCasesForAppointment(apt.id).length">
-          <div>
-            <strong>PQRS registradas</strong>
-            <div class="list">
-              <div class="list__item" *ngFor="let item of serviceCasesForAppointment(apt.id)">
-                <div>
-                  <strong>{{ serviceCaseTypeLabel(item.caseType) }} · {{ item.subject }}</strong>
-                  <p>{{ item.createdAt | date: 'short' }}</p>
-                  <p class="hint">{{ item.description }}</p>
-                  <p class="hint" *ngIf="item.adminResponse">Respuesta: {{ item.adminResponse }}</p>
-                </div>
-                <span [class]="serviceCaseStatusClass(item.status)">{{ serviceCaseStatusLabel(item.status) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="settlement-card" *ngIf="canCreateServiceCase(apt)">
-          <div>
-            <strong>PQRS postservicio</strong>
-            <p class="hint">Disponible solo cuando el servicio fue completado y la liquidación quedó cerrada.</p>
-          </div>
-          <div class="apt__meta">
-            <button class="btn btn--secondary" type="button" (click)="togglePqrsForm(apt.id)">
-              {{ pqrsForm(apt.id).open ? 'Ocultar formulario' : 'Registrar PQRS' }}
-            </button>
-          </div>
-          <div class="settlement-payment" *ngIf="pqrsForm(apt.id).open">
-            <label>
-              Tipo
-              <select
-                [ngModel]="pqrsForm(apt.id).caseType"
-                (ngModelChange)="pqrsForm(apt.id).caseType = $event"
-              >
-                <option value="petition">Petición</option>
-                <option value="complaint">Queja</option>
-                <option value="claim">Reclamo</option>
-                <option value="suggestion">Sugerencia</option>
-              </select>
-            </label>
-            <label>
-              Asunto
-              <input
-                type="text"
-                [ngModel]="pqrsForm(apt.id).subject"
-                (ngModelChange)="pqrsForm(apt.id).subject = $event"
-              />
-            </label>
-            <label>
-              Descripción
-              <textarea
-                rows="4"
-                [ngModel]="pqrsForm(apt.id).description"
-                (ngModelChange)="pqrsForm(apt.id).description = $event"
-              ></textarea>
-            </label>
-            <button class="btn btn--primary" type="button" (click)="submitServiceCase(apt)">
-              Enviar PQRS
-            </button>
+            <a
+              class="btn btn--secondary"
+              *ngIf="canManagePqrs(apt)"
+              routerLink="/pqrs"
+            >
+              Gestionar PQRS
+            </a>
           </div>
         </div>
       </article>

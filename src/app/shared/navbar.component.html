@@ -16,6 +16,7 @@
     <ng-container *ngIf="user$ | async as user; else guest">
       <a *ngIf="user.role === 'client'" routerLink="/book" routerLinkActive="active" (click)="closeMenu()">Reservar</a>
       <a *ngIf="user.role === 'client'" routerLink="/appointments" routerLinkActive="active" (click)="closeMenu()">Mis citas</a>
+      <a *ngIf="user.role === 'client'" routerLink="/pqrs" routerLinkActive="active" (click)="closeMenu()">PQRS</a>
       <a routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">Perfil</a>
       <a *ngIf="user.role === 'admin'" routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">Admin</a>
       <button class="btn btn--ghost" (click)="logout()">Cerrar sesión</button>

@@ -1,0 +1,117 @@
+<section class="section">
+  <div class="container">
+    <h1>Mis PQRS</h1>
+    <p class="lead">Gestiona aquí tus peticiones, quejas, reclamos o sugerencias posteriores a servicios ya atendidos y liquidados.</p>
+
+    <div *ngIf="loading" class="loading">Cargando PQRS...</div>
+
+    <div class="stack" *ngIf="!loading">
+      <section class="card block">
+        <div class="block__header">
+          <div>
+            <h2>Citas disponibles para registrar PQRS</h2>
+            <p class="hint">Solo aparecen las citas completadas y con liquidación cerrada.</p>
+          </div>
+          <a class="btn btn--secondary" routerLink="/appointments">Ver historial de citas</a>
+        </div>
+
+        <div class="list" *ngIf="eligibleAppointments.length; else noEligibleAppointments">
+          <article class="card item item--stacked" *ngFor="let appointment of eligibleAppointments">
+            <div>
+              <strong>{{ getServiceName(appointment.serviceId) }}</strong>
+              <p>{{ getProfessionalName(appointment.professionalId) }}</p>
+              <p>{{ appointment.date }} · {{ appointment.time }}</p>
+              <p class="hint">
+                Total: {{ money(appointment.totalAmount) }} &middot;
+                Anticipo: {{ money(appointment.depositAmount) }} &middot;
+                Pagado: {{ money(appointment.paidAmount) }}
+              </p>
+            </div>
+            <div class="actions">
+              <button class="btn btn--primary" type="button" (click)="togglePqrsForm(appointment.id)">
+                {{ pqrsForm(appointment.id).open ? 'Ocultar formulario' : 'Registrar PQRS' }}
+              </button>
+            </div>
+            <div class="form" *ngIf="pqrsForm(appointment.id).open">
+              <label>
+                Tipo
+                <select
+                  [ngModel]="pqrsForm(appointment.id).caseType"
+                  (ngModelChange)="pqrsForm(appointment.id).caseType = $event"
+                >
+                  <option value="petition">Petición</option>
+                  <option value="complaint">Queja</option>
+                  <option value="claim">Reclamo</option>
+                  <option value="suggestion">Sugerencia</option>
+                </select>
+              </label>
+              <label>
+                Asunto
+                <input
+                  type="text"
+                  [ngModel]="pqrsForm(appointment.id).subject"
+                  (ngModelChange)="pqrsForm(appointment.id).subject = $event"
+                />
+              </label>
+              <label>
+                Descripción
+                <textarea
+                  rows="4"
+                  [ngModel]="pqrsForm(appointment.id).description"
+                  (ngModelChange)="pqrsForm(appointment.id).description = $event"
+                ></textarea>
+              </label>
+              <button class="btn btn--primary" type="button" (click)="submitServiceCase(appointment)">
+                Enviar PQRS
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <ng-template #noEligibleAppointments>
+          <p class="hint">No tienes citas disponibles para registrar PQRS en este momento.</p>
+        </ng-template>
+      </section>
+
+      <section class="card block">
+        <div class="block__header">
+          <div>
+            <h2>Estados de mis PQRS</h2>
+            <p class="hint">Consulta el avance de tus casos y las respuestas del equipo administrador.</p>
+          </div>
+        </div>
+
+        <div class="list" *ngIf="serviceCases.length; else noCases">
+          <article class="card item item--stacked" *ngFor="let item of serviceCases">
+            <div class="item__head">
+              <div>
+                <strong>{{ serviceCaseTypeLabel(item.caseType) }} · {{ item.subject }}</strong>
+                <p>{{ item.createdAt | date: 'short' }}</p>
+              </div>
+              <span [class]="serviceCaseStatusClass(item.status)">{{ serviceCaseStatusLabel(item.status) }}</span>
+            </div>
+
+            <p class="hint">{{ item.description }}</p>
+
+            <div class="response" *ngIf="item.adminResponse">
+              <strong>Respuesta del equipo</strong>
+              <p>{{ item.adminResponse }}</p>
+            </div>
+
+            <div class="follow-up" *ngIf="showFollowUpSuggestion(item)">
+              <strong>Próxima cita sugerida</strong>
+              <p>
+                Tu PQRS ya fue gestionada. Te sugerimos programar con anticipación tu próxima cita para que el equipo de Aura Spa pueda ayudarte con el recordatorio.
+              </p>
+              <a class="btn btn--primary" routerLink="/book">Programar próxima cita</a>
+            </div>
+          </article>
+        </div>
+
+        <ng-template #noCases>
+          <p class="hint">Aún no has registrado PQRS.</p>
+        </ng-template>
+      </section>
+    </div>
+  </div>
+</section>

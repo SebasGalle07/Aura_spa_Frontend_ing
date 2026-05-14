@@ -15,6 +15,7 @@ import { BookingComponent } from './features/booking/booking.component';
 import { HistoryComponent } from './features/history/history.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { AdminComponent } from './features/admin/admin.component';
+import { ServiceCasesComponent } from './features/service-cases/service-cases.component';
 import { authGuard } from './core/auth.guard';
 import { adminGuard } from './core/admin.guard';
 import { clientGuard } from './core/client.guard';
@@ -35,6 +36,7 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'book', component: BookingComponent, canActivate: [clientGuard] },
   { path: 'appointments', component: HistoryComponent, canActivate: [clientGuard] },
+  { path: 'pqrs', component: ServiceCasesComponent, canActivate: [clientGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [adminGuard] },
   { path: '**', redirectTo: '' },

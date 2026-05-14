@@ -219,6 +219,19 @@ export interface ServiceCaseReview {
   adminResponse?: string | null;
 }
 
+export interface EligibleServiceCaseAppointment {
+  id: number;
+  serviceId: number;
+  professionalId: number;
+  date: string;
+  time: string;
+  status: AppointmentStatus;
+  settlementId: number;
+  totalAmount: number | string;
+  depositAmount: number | string;
+  paidAmount: number | string;
+}
+
 export type SettlementStatus = 'pending_settlement' | 'partially_paid' | 'settled' | 'voided';
 
 export interface SettlementPayment {

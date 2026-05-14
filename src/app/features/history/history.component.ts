@@ -1,20 +1,18 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { AppointmentsService } from '../../core/appointments.service';
 import { ServicesService } from '../../core/services.service';
 import { ProfessionalsService } from '../../core/professionals.service';
-import { SupportService } from '../../core/support.service';
 import { ToastService } from '../../core/toast.service';
 import { SettlementsService } from '../../core/settlements.service';
-import { Appointment, Professional, Service, ServiceCase, ServiceSettlement, SettlementReceipt } from '../../core/models';
+import { Appointment, Professional, Service, ServiceSettlement, SettlementReceipt } from '../../core/models';
 
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [NgFor, NgIf, RouterLink, DatePipe, FormsModule],
+  imports: [NgFor, NgIf, RouterLink, DatePipe],
   templateUrl: './history.component.html',
   styleUrl: './history.component.scss',
 })
@@ -25,15 +23,12 @@ export class HistoryComponent implements OnInit {
   loading = true;
   settlements: ServiceSettlement[] = [];
   receipts: Record<number, SettlementReceipt> = {};
-  serviceCases: ServiceCase[] = [];
-  pqrsForms: Record<number, { caseType: ServiceCase['caseType']; subject: string; description: string; open: boolean }> = {};
 
   constructor(
     private appointmentsApi: AppointmentsService,
     private servicesApi: ServicesService,
     private professionalsApi: ProfessionalsService,
     private settlementsApi: SettlementsService,
-    private supportApi: SupportService,
     private toast: ToastService,
     private router: Router,
   ) {}
@@ -74,15 +69,6 @@ export class HistoryComponent implements OnInit {
       },
       error: () => {
         this.settlements = [];
-      },
-    });
-
-    this.supportApi.listMyServiceCases().subscribe({
-      next: (items) => {
-        this.serviceCases = items;
-      },
-      error: () => {
-        this.serviceCases = [];
       },
     });
   }
@@ -217,104 +203,12 @@ export class HistoryComponent implements OnInit {
     });
   }
 
-  canCreateServiceCase(apt: Appointment): boolean {
+  canManagePqrs(apt: Appointment): boolean {
     if (apt.status !== 'completed') {
       return false;
     }
     const settlement = this.settlementForAppointment(apt.id);
-    if (!settlement || settlement.status !== 'settled') {
-      return false;
-    }
-    return !this.serviceCases.some(
-      (item) => item.appointmentId === apt.id && (item.status === 'open' || item.status === 'in_review'),
-    );
-  }
-
-  serviceCasesForAppointment(appointmentId: number): ServiceCase[] {
-    return this.serviceCases.filter((item) => item.appointmentId === appointmentId);
-  }
-
-  serviceCaseTypeLabel(caseType: ServiceCase['caseType']): string {
-    const labels: Record<string, string> = {
-      petition: 'Petición',
-      complaint: 'Queja',
-      claim: 'Reclamo',
-      suggestion: 'Sugerencia',
-    };
-    return labels[caseType] || caseType;
-  }
-
-  serviceCaseStatusLabel(status: ServiceCase['status']): string {
-    const labels: Record<string, string> = {
-      open: 'Abierta',
-      in_review: 'En revisión',
-      resolved: 'Resuelta',
-      closed: 'Cerrada',
-      rejected: 'Rechazada',
-    };
-    return labels[status] || status;
-  }
-
-  serviceCaseStatusClass(status: ServiceCase['status']): string {
-    const classes: Record<string, string> = {
-      open: 'tag tag--pending',
-      in_review: 'tag tag--rescheduled',
-      resolved: 'tag tag--confirmed',
-      closed: 'tag tag--completed',
-      rejected: 'tag tag--cancelled',
-    };
-    return classes[status] || 'tag';
-  }
-
-  pqrsForm(appointmentId: number): { caseType: ServiceCase['caseType']; subject: string; description: string; open: boolean } {
-    if (!this.pqrsForms[appointmentId]) {
-      this.pqrsForms[appointmentId] = {
-        caseType: 'claim',
-        subject: '',
-        description: '',
-        open: false,
-      };
-    }
-    return this.pqrsForms[appointmentId];
-  }
-
-  togglePqrsForm(appointmentId: number): void {
-    const form = this.pqrsForm(appointmentId);
-    form.open = !form.open;
-  }
-
-  submitServiceCase(apt: Appointment): void {
-    const form = this.pqrsForm(apt.id);
-    const subject = form.subject.trim();
-    const description = form.description.trim();
-    if (subject.length < 5) {
-      this.toast.show('El asunto de la PQRS debe tener al menos 5 caracteres.', 'error');
-      return;
-    }
-    if (description.length < 15) {
-      this.toast.show('La descripción de la PQRS debe tener al menos 15 caracteres.', 'error');
-      return;
-    }
-    this.supportApi.createMyServiceCase({
-      appointmentId: apt.id,
-      caseType: form.caseType,
-      subject,
-      description,
-    }).subscribe({
-      next: (created) => {
-        this.serviceCases = [created, ...this.serviceCases];
-        this.pqrsForms[apt.id] = {
-          caseType: 'claim',
-          subject: '',
-          description: '',
-          open: false,
-        };
-        this.toast.show('PQRS registrada correctamente.', 'success');
-      },
-      error: (err) => {
-        this.toast.show(err?.error?.detail || 'No fue posible registrar la PQRS.', 'error');
-      },
-    });
+    return !!settlement && settlement.status === 'settled';
   }
 
   private toDateTime(apt: Appointment): Date {

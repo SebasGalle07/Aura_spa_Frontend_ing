@@ -3,7 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { AccountCancellationRequest, AuditLog, ServiceCase, ServiceCaseCreate, ServiceCaseReview } from './models';
+import {
+  AccountCancellationRequest,
+  AuditLog,
+  EligibleServiceCaseAppointment,
+  ServiceCase,
+  ServiceCaseCreate,
+  ServiceCaseReview,
+} from './models';
 
 type AnyRecord = Record<string, any>;
 
@@ -49,6 +56,19 @@ const mapServiceCase = (data: AnyRecord): ServiceCase => ({
   updatedAt: data['updated_at'] ?? data['updatedAt'],
 });
 
+const mapEligibleAppointment = (data: AnyRecord): EligibleServiceCaseAppointment => ({
+  id: data['id'],
+  serviceId: data['service_id'] ?? data['serviceId'],
+  professionalId: data['professional_id'] ?? data['professionalId'],
+  date: data['date'],
+  time: data['time'],
+  status: data['status'],
+  settlementId: data['settlement_id'] ?? data['settlementId'],
+  totalAmount: data['total_amount'] ?? data['totalAmount'] ?? 0,
+  depositAmount: data['deposit_amount'] ?? data['depositAmount'] ?? 0,
+  paidAmount: data['paid_amount'] ?? data['paidAmount'] ?? 0,
+});
+
 @Injectable({ providedIn: 'root' })
 export class SupportService {
   constructor(private http: HttpClient) {}
@@ -86,6 +106,12 @@ export class SupportService {
     return this.http
       .get<AnyRecord[]>(`${environment.apiUrl}/service-cases/my`)
       .pipe(map((items) => items.map(mapServiceCase)));
+  }
+
+  listMyEligibleServiceCaseAppointments(): Observable<EligibleServiceCaseAppointment[]> {
+    return this.http
+      .get<AnyRecord[]>(`${environment.apiUrl}/service-cases/my/eligible-appointments`)
+      .pipe(map((items) => items.map(mapEligibleAppointment)));
   }
 
   listServiceCases(): Observable<ServiceCase[]> {
